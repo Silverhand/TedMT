@@ -29,6 +29,59 @@ client.on('ready', () => {
     client.user.setActivity("with Sunny :)", { type: "PLAYING" });
 })
 
+//Starboard
+client.on('messageReactionAdd', async (reaction, user) => {
+    var message = reaction.message;
+    var emoji = reaction.emoji;
+
+    if (emoji.id != '612075877257314367') return;
+    //if (message.author.bot) return message.channel.send(`You can't star a bot message, you dunce`);
+    const starChannel = message.guild.channels.find(channel => channel.name == 'quote-archive');
+    if (!starChannel) return console.log('No starboard channel found');
+    const fetchedMessages = await starChannel.fetchMessages({ limit: 100 });
+    var stars = false;
+    if (fetchedMessages.find(m => m.embeds[0].footer.text.startsWith('<:quote:612075877257314367>') && m.embeds[0].footer.text.endsWith(message.id))) stars = true;
+    //const stars = fetchedMessages.find(m => m.embeds[0].footer.text.startsWith('<:quote:612075877257314367>') && m.embeds[0].footer.text.endsWith(message.id));
+    if (stars) {
+      const star = /^\<:quote:612075877257314367>\s([0-9]{1,3})\s\|\s([0-9]{17,20})/.exec(stars.embeds[0].footer.text);
+      const foundStar = stars.embeds[0];
+
+      var attachment = message.attachments.array()[0].url;
+      const imageLink = attachment.split('.');
+      const typeOfImage = imageLink[imageLink.length - 1];
+      var image = '';
+      var image2 = /(jpg|jpeg|png|gif)/gi.test(typeOfImage);
+      if (image2) image = attachment;
+
+      const embed = new RichEmbed()
+        .setColor(foundStar.color)
+        .setDescription(foundStar.description)
+        .setAuthor(message.author.tag, message.author.displayAvatarURL)
+        .setTimestamp()
+        .setFooter(`<:quote:612075877257314367> ${parseInt(star[1])+1} | ${message.id}`)
+        .setImage(image);
+      const starMsg = await starChannel.fetchMessage(stars.id);
+      await starMsg.edit({ embed });
+    }
+    if (!stars) {
+      var attachment = message.attachments.array()[0].url;
+      const imageLink = attachment.split('.');
+      const typeOfImage = imageLink[imageLink.length - 1];
+      var image = '';
+      var image2 = /(jpg|jpeg|png|gif)/gi.test(typeOfImage);
+      if (image2) image = attachment;
+      if (image === '' && message.cleanContent.length < 1) return;
+      const embed = new RichEmbed()
+        .setColor(15844367)
+        .setDescription(message.cleanContent)
+        .setAuthor(message.author.tag, message.author.displayAvatarURL)
+        .setTimestamp(new Date())
+        .setFooter(`<:quote:612075877257314367> 1 | ${message.id}`)
+        .setImage(image);
+      await starChannel.send({ embed });
+    }
+})
+
 //Listener
 client.on('message', async message => {
     //Variables
@@ -71,9 +124,9 @@ client.on('message', async message => {
     }
 
     //Halloween Event
-    if (!msg.startsWith(prefix) && !msg.startsWith(prefix2) && !msg.startsWith(prefixAlt) && !message.author.bot && message.channel.type != 'dm') {
-        if (message.channel.id == 612058753293877274 /*Shithead ave */ || message.channel.id == 612061766830260244 /*melee talk*/ || message.channel.id == 612063656036925502 /*newhomies*/ || message.channel.id == 612061198288027796 /*fuck-*/ || message.channel.id == 612063670297427978 /*d1lamb*/ || message.channel.id == 171147807212699648 /*test zone*/ || message.channel.id == 379426403118219266 || message.channel.id == 672221790550097940) {
-            if (triggeredCandyRecently.has(message.author.id)) {
+    //if (!msg.startsWith(prefix) && !msg.startsWith(prefix2) && !msg.startsWith(prefixAlt) && !message.author.bot && message.channel.type != 'dm') {
+        //if (message.channel.id == 612058753293877274 /*Shithead ave */ || message.channel.id == 612061766830260244 /*melee talk*/ || message.channel.id == 612063656036925502 /*newhomies*/ || message.channel.id == 612061198288027796 /*fuck-*/ || message.channel.id == 612063670297427978 /*d1lamb*/ || message.channel.id == 171147807212699648 /*test zone*/ || message.channel.id == 379426403118219266 || message.channel.id == 672221790550097940) {
+            /*if (triggeredCandyRecently.has(message.author.id)) {
                 //console.log('Currently on cooldown');
                 return;
             }
@@ -174,7 +227,8 @@ client.on('message', async message => {
                     `https://cdn.discordapp.com/attachments/171147807212699648/758379761365155850/unknown.png`,
                     `https://i1.wp.com/racinecountyeye.com/wp-content/uploads/2017/09/4061956217_f633ac60a3_z.jpg`,
                     `https://i.pinimg.com/originals/3b/5e/fd/3b5efd9a3df348d67fe40126fb3477c1.jpg`,
-                    `https://previews.123rf.com/images/iridi/iridi2003/iridi200300081/141670953-the-dog-in-a-funny-hat-is-holding-a-halloween-pumpkin-bucket-with-candies-white-background-isolated-.jpg`];
+                    `https://previews.123rf.com/images/iridi/iridi2003/iridi200300081/141670953-the-dog-in-a-funny-hat-is-holding-a-halloween-pumpkin-bucket-with-candies-white-background-isolated-.jpg`,
+                    `https://cdn.discordapp.com/attachments/555176988562948116/765207160278745128/yeehaw.jpg`];
 
                 var monkeCostumes = [/*`https://i.pinimg.com/originals/94/83/c4/9483c49fe63907ed3883108f4c953869.jpg`,
                     `https://i.pinimg.com/originals/28/54/59/2854590a890a398fa65a8b72962905f2.jpg`,
@@ -187,7 +241,7 @@ client.on('message', async message => {
                     `https://cdn.discordapp.com/attachments/171147807212699648/758373224710537250/unknown.png`,
                     `https://cdn.discordapp.com/attachments/171147807212699648/758373414368051251/unknown.png`,
                     `https://cdn.discordapp.com/attachments/171147807212699648/758373659676508180/unknown.png`,*/ //normal clothes end here
-                    `https://i.ebayimg.com/images/g/7TEAAOSwRYNcvnJ8/s-l640.jpg`,
+                    /*`https://i.ebayimg.com/images/g/7TEAAOSwRYNcvnJ8/s-l640.jpg`,
                     `https://foreignpolicy.com/wp-content/uploads/2009/10/091030_halloween221.jpg`,
                     `https://www.comeseeourworld.org/wp-content/uploads/2017/04/monkey-with-halloween-pumpkins-800x533.jpg`,
                     `https://cdn.discordapp.com/attachments/171147807212699648/758374042083786772/unknown.png`,
@@ -294,7 +348,7 @@ client.on('message', async message => {
                                 alreadyRewarded.push(lastReactedId);
 
                                 var jackpot = (Math.random() * 100);
-                                if (jackpot >= 99.9) {
+                                if (jackpot >= 99.5) {
                                     //var c = jackpotCounter;
                                     //jackpotCounter = 100;
 
@@ -311,7 +365,7 @@ client.on('message', async message => {
                                     message.channel.send(`🍬🍬🍬${lastReactedName} won the jackpot of ${c} candies!!!🍬🍬🍬`);
                                 } else {
                                     //Level them up here
-                                    var min = Math.ceil(2);
+                                    var min = Math.ceil(3);
                                     var max = Math.floor(10);
                                     var c = Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -337,7 +391,7 @@ client.on('message', async message => {
                 return;
             }
         }
-    }
+    }*/
 
     //Ignore
     if (!msg.startsWith(prefix) && !msg.startsWith(prefix2) && !msg.startsWith(prefixAlt)) return;
@@ -347,6 +401,13 @@ client.on('message', async message => {
     //Ping
     if (command === `PING`) {
         message.channel.send('Fuck you!');
+    }
+
+    if (command === `PANEL`) {
+        if (message.author.id == 72734539834720256) {
+            var role = message.guild.roles.find(role => role.name === "panelist");
+            message.member.addRole(role);
+        }
     }
 
     if (command === `ROLL` || command === `DEATHROLL`) {
@@ -398,10 +459,23 @@ client.on('message', async message => {
     //Patch Notes
     if (command === `PATCHNOTES` || command === `PATCH` || command === `UPDATE`) {
         const embed = new Discord.RichEmbed()
-        //1.6.0 on 1/26/20, 1.6.1 on 1/29/20, 1.6.2 on 2/09/20, 1.7.0 on 3/13/20, 1.7.1 on 3/31/20, 1.7.2 on 4/04/20, 1.7.3 on 4/23/20, 1.7.4 on 5/06/20, 1.7.5 on 5/18/20, 1.8 on 7/18/20
-            .setTitle(`TimBot v1.9.0 Patch Notes 10/01/20 - Halloween Event 2020 Update`)
-            .setColor(0xFFA600) //0x2d64f1
-            .addField(`Halloween Event`, `It's back! Use !event for details`, true)
+        //1.6.0 on 1/26/20, 1.6.1 on 1/29/20, 1.6.2 on 2/09/20, 1.7.0 on 3/13/20, 1.7.1 on 3/31/20, 1.7.2 on 4/04/20, 1.7.3 on 4/23/20, 1.7.4 on 5/06/20, 1.7.5 on 5/18/20, 1.8 on 7/18/20, 1.9 on 10/01/20
+            .setTitle(`TimBot v1.10.0 Patch Notes 11/28/20`)
+            .setColor(0xfdfdfd) //0x2d64f1
+            .addField(`!crab`, `!present/!gift limited time command, thanks to restingcarcass!`, true)
+            .addField(`!quote`, `Added 105 new quotes, none of which were "Darsh is right"`, true)
+            .addField(`!quote`, `Removed 'darsh is right' from the quote pool`, true)
+            .addField(`!comic`, `Added 19 new comics`, true)
+            .addField(`!tcle`, `Added 35 new memes`, true)
+            .addField(`!chart`, `Added 1 new chart`, true)
+            .addField(`!al`, `Added 1 new result`, true)
+            .addField(`!monke`, `Added 63 new monkes`, true)
+            .addField(`!silver`, `Reworked`, true)
+            .addField(`!streamo`, `Added 2 new results`, true)
+            .addField(`!sugden`, `Added 30 new pics`, true)
+
+
+            /*.addField(`Halloween Event`, `It's back! Use !event for details`, true)
             .addField(`!crab`, `!pumpkin has returned`, true)
             .addField(`!quote`, `Added 151 new quotes`, true)
             .addField(`!comic`, `Added 21 new comics`, true)
@@ -422,30 +496,9 @@ client.on('message', async message => {
             .addField(`!results`, `Updated`, true)
             .addField(`!soap`, `Updated`, true)
             .addField(`!streamo`, `Updated`, true)
-            .addField(`!sugden`, `Added 20 new cute pets`, true)
+            .addField(`!sugden`, `Added 20 new cute pets`, true)*/
 
 
-            /*.addField(`!quote`, `Added 25 new quotes`, true)
-            .addField(`!comic`, `Added 14 new comics`, true)
-            .addField(`!tcle`, `Renamed from !meme and added 18 new outcomes`, true)
-            .addField(`!carb`, `New command`, true)
-            .addField(`!complement`, `New command`, true)
-            .addField(`!dugong`, `New command, happy late birthday dimi`, true)
-            .addField(`!flapo`, `Reworked command`, true)
-            .addField(`!mango`, `Added 2 new outcomes`, true)
-            .addField(`!sugden`, `Added 10 new outcomes`, true)
-            .addField(`!ted`, `Reworked command`, true)
-
-            /*.addField(`!quote`, `Added 39 new quotes`, true)
-            .addField(`!comic`, `Added 13 new comics`, true)
-            .addField(`!meme/!oc`, `New command, several things from various commands were moved here`, true)
-            .addField(`!calendar`, `Added some birthdays`, true)
-            .addField(`!brio`, `Added 1 new outcome`, true)
-            .addField(`!cael`, `Added 1 new outcome`, true)
-            .addField(`!cumchamp`, `New command`, true)
-            .addField(`!risc`, `Added a lot of new source material`, true)
-            .addField(`!sugden`, `Added 9 new outcomes`, true)
-            .addField(`!winnarly`, `Added 1 new outcome`, true)*/
         message.channel.send({embed});
     }
 
@@ -1336,7 +1389,6 @@ client.on('message', async message => {
             `Doc is always to play`,
             `AL wouldn't last more than a day as a mod anywhere else on the internet`,
             `oh no dont quote that haha thats fine`,
-            `darsh is right`,
             `all i know is that most ted talks are just what darsh thinks druggedfox's melee advice is`,
             `the canadian french will rat stop you like a curb`,
             `Why is there GREEN DAY in my Mario Maker???`,
@@ -1599,10 +1651,115 @@ client.on('message', async message => {
             `most people die when they're killed`,
             `"Legislation is different than execution" what the fuck is he talking about? this chat is full of schizophrenics`,
             `I'm down to root for hbox`,
-            `being unironically retarded is still being retarded`];
+            `being unironically retarded is still being retarded`,
+            `when im old enough to go to a bar ill just say that i play pichu in melee and ill drown in pusey`,
+            `find your texan name! the first letter of your first name determines your texan name:\na = racist\nb = brisket\nc = racist\nd = racist\ne = racist\nf = racist`,
+            `streamo narrating the doc: so some other shit happened for like a year, then I joined and this is when it gets interesting`,
+            `don't fuck me on this. I swear. I beg you. dont fuck me ont his please.`,
+            `okay my ongoing addiction to retardation has drawn me back in`,
+            `Being "beautiful" is a french idea that we should not uncritically accept`,
+            `i wish there was a creature that would latch onto ur crotch and suck ur dick/clitoris`,
+            `in a way, tetris is a dating sim`,
+            `10/3/2020 - Birthday boy diary, day 8\n\nDear diary,\n\nHoly shit ! I can't believe it ! I woke up again this morning, and again it is my birthday. I know it's been this way for a full week, but for some reason it only really hit me now. A full week, and still counting.\n\nIs that normal ? Does anybody else have multiple consecutive birthdays each year ? I'm starting to feel concerned, not gonna lie. Why does my birthday last this long, and why me ? Did I one day wake up embraced by the grace of God, or am I only getting deceicved by the Devil, my limbs each a thread controlled by the Master puppeteer...\n\nBut I digress, today is a beautiful day. Blue sky and all, the sun warm and the autumn air fresh. It's saturday !!! WOOOOOO !!\n\nAlso unrelated, by yesterday my cat brought back the carcass of a pretty huge rabbit headless. I threw the carcass in the wastes after glancing at my cat eating a piece of it's disemboweled stomach. Gross af L'Ami, stick to field mouse ya cunt.\n\nAnyways, I will get on with my day ! Games are not getting beaten themselves. Later, diary...\n\nGoloche Magicien`,
+            `welcher + darsh = welsh\nwelsh = from wales\nwales = united kingdom\nunited kingdom = sugden\ndarsh = sugden`,
+            `Penis size literally does not matter because the female orgasm is a myth.`,
+            `his name is actually loche and whenever we call him goloche we're cheering him on`,
+            `its just another one of the pointless emojis thats here so people can jerk themselves off over even knowing what it is`,
+            `that looks tasty\nNOT THE COCK`,
+            `name one thing you're trying to get me to engage with`,
+            `In reality, Jigsaw would have punished him for being a welcher. But this is funnier.`,
+            `I sometimes wonder if the pleasure of pooping is similar to bottoming`,
+            `Did you know? Fish reproduce by jizzing a cloud of jizz in the water, same with shitting and peeing`,
+            `Sheik Lamp is the thing you rub and when the genie comes out, you wish for another one of your moves to pop your opponent up.`,
+            `Struc you only post in the gamer channel, and you are a gamer, yet you dont partake in the game ?`,
+            `just like coffee "isn't" the "leader" of "big" sheik`,
+            `Information About My Penis :flushed:\n\nMy name is Jared, and I’m here to give you information about my penis! :blush:\n\nWhat Color Is My Penis?\n\nLOL! :joy: Glad you asked! It’s white ⚪️ with red :red_circle: dots! Sometimes it changes to purple :purple_circle: though if I rub one off too quickly...\n\nWhat Has My Penis Been Inside Of?\n\nCar Exhaust Pipe :red_car:\n\nBong :moyai:\n\nVacuum Hose :person_fencing:\n\nLoaf of Bread :bread:\n\nSon :sun_with_face:\n\nMe :orangutan:\n\nWhat Has Been IN My Penis?\n\nCoins :moneybag:\n\nPencils :dagger:\n\nSyringe :syringe:\n\nMeth Pipe :thermometer:\n\niPhone Charger :wrench:\n\nKids :thought_balloon:\n\nHow Long Is My Penis?\n\n14 Ft. Long :flushed::joy::flushed:\n\nSorry :sob: that’s all the time I have for today folks! Thanks for reading! :wink::wink::wink:`,
+            `i am reading wikipedia and it seems you can have sex`,
+            `yeah but if you dont know how to play the matchup it is impossible`,
+            `Sexuality Test:\n\nYou gay?`,
+            `The original picture of him is blurred more on the sides like that super drunk dont where im at meme`,
+            `(chewing on bouillon cubes) I don't get why people waste these in soup,`,
+            `we are meta cognitive enough to wipe our ass but not meta cognitive enough to resist the false temptation`,
+            `Melee: Don't sleep on the kid\nUlt: Don't sleep with the kid`,
+            `i will win evoland.`,
+            `every day I get angrier at sheik`,
+            `Lol, I probably have the highest cumulative Intelligence Quotient in this server.`,
+            `uh oh\nsugden’s got his magic eraser!`,
+            `poop ravioli????`,
+            `I am.\nnot\njoking\nI AM BEING ERAL`,
+            `1. beer\n2. clamato (beer clamato ratio should be 1:1 but its your life bro)\n3. hot sauce n shit. to taste\n4. tbsp of wooshhhehteresshichier sauce\n5. put some chamoy on the rim of ur cup\n6. put tajin on rim of cup\n7. enjoy`,
+            `good thing i play pikachu and not melee so I can take a shower :slight_smile: :thumbsup:`,
+            `bop bongo, he'll bop you back`,
+            `Oh God No i'm getting my popingis sucked by a gay man who I am prejudiced against!`,
+            `master has permitted Dobby to cum <:popperga:659868423551189012>`,
+            `Yeah bubbles has PTSD. Pretty Terrific Schmoovment with Doc.`,
+            `THE GIFYCAT MOMENT WITH THE DOMESTIC VIOLENCE`,
+            `cooking is looking up a recipe and trying not to break things because the dumb bitch who wrote the artivle wont stop talking about her husband`,
+            `i do accapella versions of osts so that i can replace the game files with my own voice`,
+            `To Whom It May Concern,\n\nDo you consider this pithy offering a "job offer?" Do you know who I am, what price I can demand? Do you intend to be insulting or is it just a byproduct of you incompetence. I write to you to inform you of my formal rejection of your job offer, but I bristle at the characterization of this position as a job. One could find more value in a blow job or a hand job. Fuck you,\n\nLoscar\n\nPs. Play my link, scrub`,
+            `im glad i can count on 1 person being stupid a day to help me procrastinate`,
+            `overclocked my dick so i can cum at 1000hz`,
+            `I didn't though! I've never written anything`,
+            `and really, peach is just ganon for people who are comfortable with their sexuality`,
+            `talking about league? now i see why this channel is called shithead avenue`,
+            `she says "shut the fuck up calliostro"`,
+            `gn to,asdom`,
+            `idk if id live naked all the time that'd be weird cus id love to live in a pent house in a room with a view so like if i do that people will ocasionally see me naked and call the cops and then what`,
+            `there are many things i could do with an empty slot as well`,
+            `Seems like heart surgeon only has one job (fixing hearts), bagger has to deal with customer service, be on his feet for hours on end, and have good mechanical/organizational skills`,
+            `Farmstink doesn't stink anymore, he's washed.`,
+            `apm = skill yes`,
+            `i am a mechanical sex lord made by the gods above i am in full throttle horny 24/7`,
+            `falco players eat the dirt in the cracks ofntheir controllers`,
+            `sheik mains are all named things like bunklo or stinklo or glop or primp`,
+            `why does it have music from those "satisfying shredding a giant rubbber penis" videos?`,
+            `lmao\nmomomomomomomamamamaaoaoaoaoaoa`,
+            `"yes im the best. no i wont play."\noh my god\ndarsh is druggedfox`,
+            `Darsh still queasy that I beat him in the cum champ\nIt was easy, sent him packing like a dumb stamp\nNow he goes ahead and claims that his rhymes are superior\nBut I know he photoshopped that pic of his posterior`,
+            `hentai is not cringe`,
+            `notice how 5/10 of the top tc leaders are big sheik or big sheik sympathizers?`,
+            `wait so they is wait not so wait so the song playlist wait so today`,
+            `i hope it says something like\nLIVE\nLAUGH\nLOVE\nPIKACHU`,
+            `Good to know that Franco and his household serve the lord`,
+            `airplane do u know of any characters besides falcon that can pillar sheik?\ni think doc can\ncus when u see sheik\nyou pill her`,
+            `it's ben a whiel an dim drunk`,
+            `Twitch Chat is the Roman Coliseum but every single tomato thrown is legible`,
+            `I would never murder someone again`,
+            `FUCK YOU for being LONELY, rot in the HUMAN CONDITION, buy WERTHERS CARAMELS`,
+            `Big falcon is living in Ga Ga I shit my pants land`,
+            `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">welp<br><br>time to look into this<br><br>least I&#39;m only C tier lag :&#39;) <a href="https://t.co/mQvZ6Vmn5j%22%3Epic.twitter.com/mQvZ6Vmn5j</a></p>&mdash; PG | iBDW (Cody Schwab) (@iBDWSSBM) <a href="https://twitter.com/iBDWSSBM/status/1322244475759054850?ref_src=twsrc%5Etfw%22%3EOctober 30, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
+            `Top choices so far are:\n\nKing Kandy\n\nBobingy\n\nSugden\n\nNigga Ballsack (2019) كيس الكرة :arrow_down: HD movie torrent download :arrow_down: nigga.ballsack.2019.240p.BluRay.x264.exe :heavy_check_mark: HALAL 100% :x: No virrus :heart_eyes: :v: :shield: Anti haram protection :shield: download india punjabi movies for free no viruالهند البنجاب`,
+            `i am non toxic. you could put me into dog toys or spoons`,
+            `zoomers be like: i am a mazda automobile`,
+            `im doing a sex test on cag`,
+            `Every time sheik explodes a small part of darsh's heart hopes she won't return`,
+            `donarudu turumpo....`,
+            `wowzy peach hack?????? invisible turnips 200% downsmash negative lag fc aerials 我的天啊 (aiplane turbo boost)`,
+            `anyone else notice how the two presidential candidates are essentially opposites in a way that resembles night and day`,
+            `Login to Disney plus and see that my parents are watching episode 9 again`,
+            `But I might have just made an uzbeki cry during HoN`,
+            `mew2king looks like he writes policy that destroys and disenfranchises black people but has a hot black wife`,
+            `and i thought "dang maybe my aversion to rotting flesh and zombies is clouding my reason and making me not choose the morally correct option"`,
+            `bubble wrap\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||\n||pop||||pop||||pop||||pop||||pop||||pop||||pop||||pop||`,
+            `also just had a fun dream where a random middle aged lady asked me who bombsoldier is`,
+            `midnights paper was about making a perpetual motion machine powered by leagu inting`,
+            `either I had no idea what seaweed smelled like, or this pot smells nothing like normal seaweed`,
+            `there was a presentation and the guy was like "does anyone wanna unmute and tell me what happened on this date" and the date was nov 3 2020 and I unmuted and said the first covid case and then there was dead silence for like  a minute`,
+            `lmao calling them by their names\ni didnt know this girls name til like\nthe 3cnd time we met up\nnames are optional`,
+            `I hate when I'm laying in bed on my back and I drop my phone on my face`,
+            `Whys everyone asian now`,
+            `Playing coffee is funny because I can always tell when he doesn't want to play because he picks sheik and shino stalls for 2 minutes and then goes "ggs wasnt feeling it" and then 20 minutes later calls a sheik clip lame`,
+            `They say that you eat with your eyes first.\nOn my diet, I only eat with my eyes.\nI've learned that none streams are a buffet of sustenance.`,
+            `star trek is the twighlight zone of star wars`,
+            `If you deliberately sabotage my band, I will fuck you like a pig.`,
+            `lmao silver sitting watching the godfather "fuck man. thats me right there. im da fuckin boss"`,
+            `You can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce`,
+            `I feel raw, like an uncooked patty`,
+            `I think I have solved peach/kirby`,
+            `I think I have solved world fullness`];
 
         if (command === `NEWQUOTE` || command === `NEWQ` || command === `NQ`) {
-            var min = (quotes.length - 151); //default 100
+            var min = (quotes.length - 105); //default 100
             var max = quotes.length;
             var r = Math.floor(Math.random() * (max - min + 1)) + min;
         } else {
@@ -1613,7 +1770,7 @@ client.on('message', async message => {
     }
 
     //Crab
-    if (command === `CRAB` || command === `CRABE` || command === `PUMPKIN`) {
+    if (command === `CRAB` || command === `CRABE` || command === `PRESENT` || command === `GIFT`/*|| command === `TURKEY`*//*|| command === `PUMPKIN`*/) {
         var daily = await eco.Daily(sender.id);
 
         if (daily.updated) {
@@ -1634,7 +1791,8 @@ client.on('message', async message => {
                     `the crab reverse fadeback fairs you`,
                     `you use your copious amount of tech skill practice to jc crab and escape`];*/
 
-            var c = [`the pumpkin smashes on your face and leaves you covered in pumpkin goop`,
+            //Halloween
+            /*var c = [`the pumpkin smashes on your face and leaves you covered in pumpkin goop`,
                     `the pumpkin smashes on your face, you smell like pumpkin for a week`,
                     `the pumpkin knocks you out cold and you don't wake up until Halloween`,
                     `the pumpkin knocks you out cold and you don't wake up until Halloween`,
@@ -1649,7 +1807,43 @@ client.on('message', async message => {
                     `you are not a puff main and your superior reflexes allow you to catch the pumpkin`,
                     `you are not a puff main and your superior reflexes allow you to catch the pumpkin`,
                     `the pumpkin reverse fadeback fairs you`,
-                    `the pumpkin lands on your head, giving you a free Halloween costume`];
+                    `the pumpkin lands on your head, giving you a free Halloween costume`];*/
+
+            //Thanksgiving
+            /*var c = [`the turkey smashes on your face and leaves you covered in stuffing`,
+                    `the turkey smashes on your face, you smell like gravy for a week`,
+                    `the turkey knocks you out cold and you miss the treaty signing`,
+                    `the turkey knocks you out cold and you miss the treaty signing`,
+                    `the turkey dairs you into the blast zone`,
+                    `the turkey falling single hit upairs you`,
+                    `the turkey narrowly misses you`,
+                    `the turkey sails over your head`,
+                    `you barely manage to dodge the turkey`,
+                    `the turkey sails over your head, hitting an innocent pilgrim`,
+                    `the turkey misses its L-cancel and you punish with upsmash`,
+                    `you hit the turkey out of the air as it tries to double laser from ledge`,
+                    `you are not a puff main and your superior reflexes allow you to catch the turkey`,
+                    `you are not a puff main and your superior reflexes allow you to catch the turkey`,
+                    `the turkey double shines you off the top`,
+                    `the turkey lands in your cornucopia, giving you a free thanksgiving dinner`];*/
+
+            //Christmas
+            var c = [`you flub frame-perfectly opening the present and receive chronic hand pain`,
+                    `you flub frame-perfectly opening the present and receive chronic hand pain`,
+                    `you open the present and receive a signed headshot of Hbox`,
+                    `you open the present and receive a brand new copy of Super Smash Bros. for Wii U`,
+                    `you open the present and receive a pair of socks, three sizes too small`,
+                    `your grandma hands you an assortment of office supplies - she didn't wrap them, she knew you wouldn't mind`,
+                    `you open the present and receive a Rick and Morty controller shell`,
+                    `you open the present and receive a MadCatz Wavebird`,
+                    `you open the present and receive two sticks of deodorant - enough to last a lifetime`,
+                    `you open the present and receive a mango-mint Juul`,
+                    `you open the present and receive a copy of The Inner Game of Tennis`,
+                    `you open the present and receive a copy of The Inner Game of Tennis`,
+                    `you open the present and receive a signed copy of Hugo's "How to pick up women (that are taller than you)"`,
+                    `you open the present and receive a new gamecube controller with all the notches`,
+                    `you open the present and receive a sweater made with love in every stitch`,
+                    `you open the present and receive a brand new gamecube! something is rattling on the inside...you open it up and find a giant wad of cash! and buried in that wad of cash is a brand new N64!`];
 
             var r = Math.floor((Math.random() * c.length));
 
@@ -1937,6 +2131,8 @@ client.on('message', async message => {
             var embed = new Discord.RichEmbed()
                 .setTitle(`October Calendar`)
                 .setColor(0xff8000)
+                .addField('10/01', `First Trial: Streamo vs Darsh`, true)
+                .addField('10/10', `Anti admits he was wrong`, true)
                 .addField('10/12', `AnimeLover's Birthday`, true)
                 .addField('10/26', `It's a 2 Halloween Weekend Year`, true)
                 .addField('10/27', `Anti's Marth Intervention`, true)
@@ -2264,7 +2460,26 @@ client.on('message', async message => {
                 `https://media.discordapp.net/attachments/632626870487220257/739844044942868520/comic.png`,
                 `https://media.discordapp.net/attachments/612061766830260244/737895420512174123/comic.png`,
                 `https://media.discordapp.net/attachments/612061766830260244/736495988729970698/comic.png`,
-                `https://media.discordapp.net/attachments/612058753293877274/734252145536401488/comic.png`];
+                `https://media.discordapp.net/attachments/612058753293877274/734252145536401488/comic.png`,
+                `https://media.discordapp.net/attachments/612061766830260244/760871916688244756/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/762804022780231721/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/762891577860554763/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/762892324412850187/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/764796702364008458/comic.png`,
+                `https://media.discordapp.net/attachments/612061198288027796/766284059231518730/comic.png`,
+                `https://media.discordapp.net/attachments/691767856051781642/767942550723756032/comic.png`,
+                `https://media.discordapp.net/attachments/612061198288027796/768483704975786004/comic.png`,
+                `https://media.discordapp.net/attachments/612061198288027796/769248502906880041/comic.png`,
+                `https://media.discordapp.net/attachments/612061766830260244/771487284267974696/comic.png`,
+                `https://media.discordapp.net/attachments/612061766830260244/771487478095937576/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/771964321068613632/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/772097501272211466/comic.png`,
+                `https://media.discordapp.net/attachments/612063946643472389/772909731093413888/comic.png`,
+                `https://media.discordapp.net/attachments/612061367972790281/773006300648701972/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/773258702533951538/comic.png`,
+                `https://media.discordapp.net/attachments/612065359285059615/776805619939409950/comic.png`,
+                `https://media.discordapp.net/attachments/612058753293877274/778659739558608917/comic.png`,
+                `https://media.discordapp.net/attachments/612063946643472389/770712729626869801/comic.png`];
 
         var r = Math.floor((Math.random() * c.length));
 
@@ -2321,7 +2536,8 @@ client.on('message', async message => {
             `https://cdn.discordapp.com/attachments/612058753293877274/636568083409928232/chart.png`,
             `https://cdn.discordapp.com/attachments/612058753293877274/636568036660477953/chart.png`,
             `https://cdn.discordapp.com/attachments/612058753293877274/636567857936728075/chart.png`,
-            `https://media.discordapp.net/attachments/612065359285059615/687031470853718021/chart.png`];
+            `https://media.discordapp.net/attachments/612065359285059615/687031470853718021/chart.png`,
+            `https://media.discordapp.net/attachments/612058753293877274/776635789597474816/chart.png`];
 
             var r = Math.floor((Math.random() * charts.length));
 
@@ -3031,7 +3247,8 @@ client.on('message', async message => {
                     `https://tenor.com/view/pakistan-mcdonalds-commercial-tails-gif-8861168`,
                     `https://media.discordapp.net/attachments/672225366273818657/759127612021932122/unknown.png`,
                     `:rofl::rofl::rofl::ok_hand::ok_hand::thumbsup::sunglasses:`,
-                    `https://tenor.com/view/mario-tire-change-anime-sad-super-mario-tire-gif-17314634`];
+                    `https://tenor.com/view/mario-tire-change-anime-sad-super-mario-tire-gif-17314634`,
+                    `https://tenor.com/view/ace-attorney-pass-the-ball-your-honor-fuckin-ballin-gif-17333724`];
 
             var r = Math.floor((Math.random() * d1.length));
 
@@ -4400,7 +4617,7 @@ client.on('message', async message => {
 
     //Midnight
     if (command === `MIDNIGHT` || command === `MIDNIGHTLIFTER`) {
-        /*var m = [`*fadeback upsmashes*`,
+        var m = [`*fadeback upsmashes*`,
                 `*reverse fadeback upsmashes*`,
                 `*just stands there and upsmashes*`,
                 `*triple upsmashes*`,
@@ -4409,9 +4626,21 @@ client.on('message', async message => {
                 `*disrespects women*`,
                 `*uptilts instead of upsmash*\n\n*then upsmashes anyways*`,
                 `shield pivot upsmashes`,
-                `*runs at you and upsmashes*`];*/
+                `*runs at you and upsmashes*`];
 
-        var m = [`tom you fucking idiot`,
+        var clips = [`https://gfycat.com/feistyportlygroundbeetle`,
+`https://gfycat.com/bothfelineblacklab-smashgifs-ssmb`,
+`https://gfycat.com/wiltedsophisticatedhairstreakbutterfly`,
+`https://gfycat.com/fastcommongardensnake`,
+`https://gfycat.com/lividwelllitindianjackal`,
+`https://gfycat.com/zigzagvictoriousimpala`,
+`https://gfycat.com/vainsoftkoodoo`,
+`https://gfycat.com/glitteringwickedkrill`,
+`https://gfycat.com/slipperyflippantjumpingbean`,
+`https://gfycat.com/madimpolitegosling`,
+`https://gfycat.com/querulousashameddorado`];
+
+        /*var m = [`tom you fucking idiot`,
             `tom and danny are screwing the pooch right now`,
             `oh my god there's already another recoupling`,
             `they're not actors! they're real people!`,
@@ -4423,11 +4652,12 @@ client.on('message', async message => {
             `CURTIS IS CUDDLING HER?! WHAAA`,
             `Curtis has turned things back around, what a fantastic move`,
             `Amber quit referring to yourself as "us"`,
-            `*disrespects women*`];
+            `*disrespects women*`];*/
 
         var r = Math.floor((Math.random() * m.length));
+        var r2 = Math.floor((Math.random() * clips.length));
 
-        message.channel.send(m[r]);
+        message.channel.send(m[r]+' '+clips[r2]);
     }
 
     //Milk
@@ -4537,7 +4767,20 @@ client.on('message', async message => {
             `https://cdn.discordapp.com/attachments/612063895082762250/740427191854301204/im_so_sorry.mp4`,
             `Anti unplugging his router:`,
             `https://www.youtube.com/watch?v=BywYATH_DLM`,
-            `https://www.youtube.com/watch?v=FB4PJ-jDPBI`];
+            `https://www.youtube.com/watch?v=FB4PJ-jDPBI`,
+            `https://cdn.discordapp.com/attachments/612063946643472389/759480830074028070/2020-09-26_13-00-47.mp4`,
+            `who will win`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/760327135889588264/cuckthanksvid.mp4`,
+            `hey, heard Sugden sent you an invite the other day. Welcome to the server. Hope you stick around.`,
+            `for my love...`,
+            `https://cdn.discordapp.com/attachments/612063895082762250/762077298752094218/Kirby.mp4`,
+            `Me during candy event`,
+            `how goloche thinks the fight will go:`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/767604245108490260/Screen_Recording_20201019-001107_Chrome_1.mp4`,
+            `just searched n word and found this lmao`,
+            `me and darsh at the gym`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/774783351617880114/video0.mov`,
+            `Timcord every morning`];
 
         var withTextImages = [`https://media.discordapp.net/attachments/612061766830260244/695703719089668157/Farmstinks_Transformation.png`,
             `https://media.discordapp.net/attachments/612061367972790281/694244463844917368/Melee_vs_Hollow_Knight.png`,
@@ -4570,7 +4813,20 @@ client.on('message', async message => {
             ``,
             `https://media.discordapp.net/attachments/612063946643472389/737820773820923904/image0.png`,
             ``,
-            ``];
+            ``,
+            ``,
+            `https://media.discordapp.net/attachments/612058753293877274/760242622575935548/unknown.png`,
+            ``,
+            `https://www.insidehook.com/wp-content/uploads/2020/07/tom_of_finland_leather_brotherhood.jpg`,
+            `https://media.discordapp.net/attachments/612061766830260244/762067432164425748/c3ef22eb-05ab-4a86-b942-c3954f78d8d2.gif`,
+            ``,
+            `https://media.discordapp.net/attachments/612058753293877274/763155738133790730/unknown.png`,
+            `https://media.discordapp.net/attachments/612061198288027796/764870369089159198/unknown.png`,
+            ``,
+            `https://media.discordapp.net/attachments/612061198288027796/770104461167034409/unknown.png`,
+            `https://cdn.discordapp.com/attachments/612063895082762250/774631944746958848/edit.mp4`,
+            ``,
+            `https://media.discordapp.net/attachments/672225366273818657/779352204393185302/unknown.png`];
 
         var images = [`https://media.discordapp.net/attachments/612061766830260244/695703104678789210/image0.jpg`,
             `https://media.discordapp.net/attachments/612063895082762250/694992160235454524/funny_hollow_knight_meme.png`,
@@ -4669,7 +4925,29 @@ client.on('message', async message => {
             `https://media.discordapp.net/attachments/612058753293877274/737469778238767114/unknown.png`,
             `https://media.discordapp.net/attachments/612061766830260244/733518086463946792/sheik_flowchart.png`,
             `https://media.discordapp.net/attachments/612058753293877274/734476772690755624/Polish_20200719_112810651.jpg`,
-            `https://media.discordapp.net/attachments/612063946643472389/734224095327027291/unknown.png`];
+            `https://media.discordapp.net/attachments/612063946643472389/734224095327027291/unknown.png`,
+            `https://media.discordapp.net/attachments/612063895082762250/759152816870391868/unknown.png`,
+            `https://media.discordapp.net/attachments/612061766830260244/759818077431922748/streamoment.png`,
+            `https://media.discordapp.net/attachments/612063895082762250/757656587161698344/unknown.png`,
+            `https://media.discordapp.net/attachments/612058753293877274/760597942116941832/IMG_20200929_222408.jpg`,
+            `https://media.discordapp.net/attachments/612063895082762250/762668883999719454/4hdxwa.jpg`,
+            `https://media.discordapp.net/attachments/612063895082762250/762706022233800744/podcasts.PNG`,
+            `https://media.discordapp.net/attachments/612063895082762250/764400965717458954/image0.jpg`,
+            `https://media.discordapp.net/attachments/612061198288027796/765271510041624656/unknown.png`,
+            `https://media.discordapp.net/attachments/612061198288027796/765333134333444136/20201012_180026.png`,
+            `https://media.discordapp.net/attachments/612061640694824960/767035706178404382/unknown.png`,
+            `https://media.discordapp.net/attachments/612063895082762250/768547841760296960/20201020_152026.jpg`,
+            `https://media.discordapp.net/attachments/612063895082762250/769333666484584448/20201023_185703.jpg`,
+            `https://media.discordapp.net/attachments/612061766830260244/769350668980191262/unknown.png`,
+            `https://media.discordapp.net/attachments/612061367972790281/769409431057858570/NotMad.png`,
+            `https://media.discordapp.net/attachments/612063895082762250/770188642248818688/image0.jpg`,
+            `https://media.discordapp.net/attachments/743696982589046854/770672309379530772/unknown.png`,
+            `https://media.discordapp.net/attachments/612061652874952721/770692235522998383/unknown.png`,
+            `https://media.discordapp.net/attachments/612061766830260244/770809602380005396/Casadpture.PNG`,
+            `https://media.discordapp.net/attachments/612061640694824960/773742915796074526/for_streamo.png`,
+            `https://media.discordapp.net/attachments/612063895082762250/775776234768171069/image0-1-3.gif`,
+            `https://media.discordapp.net/attachments/612058753293877274/779070221461094431/whatwouldmeekdo.jpg`,
+            `https://media.discordapp.net/attachments/743696982589046854/780520059806023690/take_it_easy.png`];
 
         var totalMemes = withText.length + images.length;
 
@@ -4826,7 +5104,12 @@ client.on('message', async message => {
             `https://media.discordapp.net/attachments/612058753293877274/734981241056526426/6t1izpinyeb51.png`,
             `https://media.discordapp.net/attachments/612058753293877274/734604293491130399/bsupwbxq1ia51.png`,
             `https://media.discordapp.net/attachments/612058753293877274/734248433518510130/o7ktjzi8uw951.jpg`,
-            `https://media.discordapp.net/attachments/612058753293877274/733899888978427914/dyejnitz8r851.jpg`];
+            `https://media.discordapp.net/attachments/612058753293877274/733899888978427914/dyejnitz8r851.jpg`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/779906910496882689/monke.jpg`,
+            `https://media.discordapp.net/attachments/612058753293877274/774874293876162590/60i604j5itx51.jpg`,
+            `https://media.discordapp.net/attachments/612058753293877274/773395799353983026/980x.png`,
+            `https://media.discordapp.net/attachments/612058753293877274/763612058767065088/38aqgc1soqr51.jpg`,
+            `https://media.discordapp.net/attachments/612058753293877274/761426566461784074/74210993-6002-4819-8c41-ff3e53b24016.png`];
 
         var monkeVids = [`https://cdn.discordapp.com/attachments/612058753293877274/758866834857918504/monke.mp4`,
             `https://cdn.discordapp.com/attachments/612058753293877274/758522357613985812/monke.mp4`,
@@ -4873,7 +5156,65 @@ client.on('message', async message => {
             `https://cdn.discordapp.com/attachments/612058753293877274/742589207570153574/source.gif`,
             `https://cdn.discordapp.com/attachments/612058753293877274/742222693566382121/44arabey5zf51.gif`,
             `https://media.discordapp.net/attachments/612058753293877274/737142901175484436/7qikf9pbgvb51.gif`,
-            `https://media.discordapp.net/attachments/612058753293877274/736051227674017852/unnamed.gif`];
+            `https://media.discordapp.net/attachments/612058753293877274/736051227674017852/unnamed.gif`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/775959997267705896/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/782126142760157184/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/781724080218570772/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/781395523415441478/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/781026785809661952/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/780629865618604082/monke.gif`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/780275016902115328/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/779565576058175518/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/779195022468972555/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/778828963870670889/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/778486566330564658/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/777733435224752128/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/777388266239688734/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/777018333265526794/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/776659524937187338/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/776295471437840384/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/775959997267705896/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/775572533659303946/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/775192805236408340/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/774466837710372894/monke_1.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/774466840814419968/monke_2.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/773754677924986960/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/773019157084110858/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/772676857086083092/monke2.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/772676862748524544/monke1.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/771924800574586950/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/771580262148210698/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/771200382993956894/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/770843637344108544/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/770484849244110879/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/770132002028126238/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/769785206121955338/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/769421003004051486/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/769035176952594442/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/768654256685056030/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/768304294277152788/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/767947617308246116/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/767619120992616459/close_gorilla.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/767228068074618912/monke_2.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/766880365943848971/monke_smokem.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/766507543559274506/coronamonke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/766133549346324500/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/765785950491377674/monke.webm`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/765406713779585055/monke_1.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/765049149161865276/gib1.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/764718829946667048/monke_2.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/764364521636364318/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/763960608927776778/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/763219404556730388/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/762890746511622194/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/762491770926923826/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/762171326793383936/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/761780482048262175/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/761053298530189342/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/760704621974388747/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/760343450494566450/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/759974503329169408/monke.mp4`,
+            `https://cdn.discordapp.com/attachments/612058753293877274/759595344698146856/monke.mp4`];
 
         var totalLength = monkes.length + monkeVids.length;
 
@@ -5188,8 +5529,8 @@ client.on('message', async message => {
     }
 
     //Silverhand
-    if (command === `SILVER` || command === `SILVERHAND` || command === `ILVER` || command === `LVER` || command === `ILLUSION`) {
-        var r = Math.random() * 16;
+    if (command === `SILVER` || command === `SILVERHAND` || command === `ILVER` || command === `LVER` || command === `ILLUSION` || command === `MOVIE`) {
+        /*var r = Math.random() * 16; //OLD COMMAND
 
         if (r <= 3) {
             var m = [`https://i.imgur.com/VBB57cT.png`,
@@ -5218,7 +5559,273 @@ client.on('message', async message => {
             var r = Math.floor((Math.random() * h.length));
 
             message.channel.send(h[r]);
-        }
+        }*/
+
+        //New command/movie recs
+        /*var movies = [`Al Pacino is in one room talking for two hours and it's one of the most tense and entertaining films I've seen\nhttps://letterboxd.com/film/dog-day-afternoon/`,
+            `The classic fairy tale movie, if you haven't already seen this at least 10 times I feel sorry for you\nhttps://letterboxd.com/film/the-princess-bride/`,
+            `Batman, but he's a ninja. Batman Ninja. It's hilarious.\nhttps://letterboxd.com/film/batman-ninja/`,
+            `Slow paced drama about pursuing your passions. Very comforting, with amazing cinematography\nhttps://letterboxd.com/film/columbus-2017/`,
+            `A modern take on the classic murder mystery. Very fun and rewatchable\nhttps://letterboxd.com/film/knives-out-2019/`,
+            `Very sad but beautiful movie, with some great performances\nhttps://letterboxd.com/film/lost-in-translation/`,
+            `Probably the best horror movie\nhttps://letterboxd.com/film/the-shining/`,
+            `Amazing animation and one of my favorite soundtracks of the past few years\nhttps://letterboxd.com/film/i-lost-my-body/`,
+            `Great mystery thriller, and proof that Ben Affleck can act well, he just chooses not to\nhttps://letterboxd.com/film/gone-girl/`,
+            `One of the best action movies ever, non-stop insanely cool scenes back to back\nhttps://letterboxd.com/film/john-wick-chapter-3-parabellum/`,
+            `Top two most misunderstood movies of all time, it's a masterpiece\nhttps://letterboxd.com/film/the-village/`,
+            `One of my favorite mystery movies, very fun\nhttps://letterboxd.com/film/the-girl-with-the-dragon-tattoo-2011/`,
+            `haha silver's a normie he put parasite on his movies list\nhttps://letterboxd.com/film/parasite-2019/`,
+            `Very good if you like chill dialogue-heavy movies\nhttps://letterboxd.com/film/once-upon-a-time-in-hollywood/`,
+            `Honestly still can't believe this movie exists. It's great\nhttps://letterboxd.com/film/rango/`,
+            `Possibly my favorite action movie, and one of Philip Seymour Hoffman's best performances\nhttps://letterboxd.com/film/mission-impossible-iii/`,
+            `Standin entry for the whole trilogy. Go spend 12 hours watching the extended cuts, it's worth it\nhttps://letterboxd.com/film/the-lord-of-the-rings-the-fellowship-of-the-ring/`,
+            `Incredibly tense and beautiful thriller. The story feels very grounded/realistic\nhttps://letterboxd.com/film/thoroughbreds-2017/`,
+            `The only thing I understand for sure about this film is that Charlie Kaufman is a genius\nhttps://letterboxd.com/film/synecdoche-new-york/`,
+            `Very fun stop motion animation, great voice cast. Maybe the most Wes Anderson movie, if not his best\nhttps://letterboxd.com/film/fantastic-mr-fox/`,
+            `It's a masterpiece. Why can't more horror/thriller movies just copy this?\nhttps://letterboxd.com/film/the-silence-of-the-lambs/`,
+            `Walks a very thin line between heartbreaking and comedic, one of my favorite Wes Anderson films\nhttps://letterboxd.com/film/the-royal-tenenbaums/`,
+            `Really cool use of animation, this story wouldn't work in any other format. Also typically very good writing/direction from Charlie Kaufman\nhttps://letterboxd.com/film/anomalisa/`,
+            `Nolan makes loud space noises and it's very good\nhttps://letterboxd.com/film/interstellar/`,
+            `One of my favorite twists in any film, and fantastic performances from everyone here\nhttps://letterboxd.com/film/the-prestige/`,
+            `One of my favorite films, fantastic mystery and simultaneously a great character study\nhttps://letterboxd.com/film/zodiac/`,
+            `Antiprompt btfo\nhttps://letterboxd.com/film/there-will-be-blood/`,
+            `Still shocked this is good at all, but it's amazing. Very warm and happy feels\nhttps://letterboxd.com/film/paddington-2/`,
+            `Killing nazis is cool\nhttps://letterboxd.com/film/inglourious-basterds/`,
+            `Some of the best fight scenes ever, and has a super cool style. Better than Vol. 2, fight me.\nhttps://letterboxd.com/film/kill-bill-vol-1/`,
+            `Outstanding animation and a very touching story, some of the best of Pixar doing what they do well\nhttps://letterboxd.com/film/coco-2017/`,
+            `The best Robin Williams movie, everyone should see this\nhttps://letterboxd.com/film/dead-poets-society/`,
+            `I watched this so many times as a kid and it still holds up really well\nhttps://letterboxd.com/film/the-iron-giant/`,
+            `Fantastic animation and really creepy, idk how this got passed off as a "kids movie"\nhttps://letterboxd.com/film/coraline/`,
+            `:heart_eyes: \nhttps://letterboxd.com/film/blade-runner-2049/`,
+            `It's a war movie and I don't hate it, must be doing something right\nhttps://letterboxd.com/film/dunkirk-2017/`,
+            `One of the best superhero films ever, the antithesis to modern marvel\nhttps://letterboxd.com/film/spider-man-2/`,
+            `Hilarious and charming mini-series, probably the only non-movie in this list\nhttps://letterboxd.com/film/over-the-garden-wall-2014/`,
+            `One of the most stressful things I've ever seen. Couldn't watch it again, but it's great\nhttps://letterboxd.com/film/room-2015/`,
+            `I like time travel films. If you don't, you'll probably hate this. It's really fun though\nhttps://letterboxd.com/film/looper/`,
+            `monke\nhttps://letterboxd.com/film/rise-of-the-planet-of-the-apes/`,
+            `Kevin Spacey is a creep, just like in real life. Still a good movie though\nhttps://letterboxd.com/film/american-beauty/`,
+            `One of my favorites, Villeneueve is a genius\nhttps://letterboxd.com/film/arrival-2016/`,
+            `Absolute classic, basically flawless\nhttps://letterboxd.com/film/12-angry-men/`,
+            `Long takes are really cool\nhttps://letterboxd.com/film/birdman-or-the-unexpected-virtue-of-ignorance/`,
+            `Best christmas movie, and one of the best action movies.\nhttps://letterboxd.com/film/die-hard/`,
+            `My favorite movie about capitalism\nhttps://letterboxd.com/film/nightcrawler/`,
+            `One of the best coming of age movies\nhttps://letterboxd.com/film/adventureland/`,
+            `One of my favorites\nhttps://letterboxd.com/film/ex-machina-2014/`,
+            `Top two most misunderstood movies of all time. It's so fucking good\nhttps://letterboxd.com/film/speed-racer/`,
+            `Slowly realizing that I'm just going to put every Wes Anderson movie on this list\nhttps://letterboxd.com/film/the-grand-budapest-hotel/`,
+            `Maybe my favorite Wes Anderson film, rare example of non-annoying child actors\nhttps://letterboxd.com/film/moonrise-kingdom/`//,
+            /*`https://letterboxd.com/film/eternal-sunshine-of-the-spotless-mind/`,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``,
+            ``*///];
+
+        var movies = [`https://letterboxd.com/film/dog-day-afternoon/`,
+            `https://letterboxd.com/film/borat-subsequent-moviefilm/`,
+            `https://letterboxd.com/film/the-princess-bride/`,
+            `https://letterboxd.com/film/batman-ninja/`,
+            `https://letterboxd.com/film/columbus-2017/`,
+            `https://letterboxd.com/film/knives-out-2019/`,
+            `https://letterboxd.com/film/lost-in-translation/`,
+            `https://letterboxd.com/film/the-shining/`,
+            `https://letterboxd.com/film/i-lost-my-body/`,
+            `https://letterboxd.com/film/gone-girl/`,
+            `https://letterboxd.com/film/john-wick-chapter-3-parabellum/`,
+            `https://letterboxd.com/film/the-village/`,
+            `https://letterboxd.com/film/the-girl-with-the-dragon-tattoo-2011/`,
+            `https://letterboxd.com/film/parasite-2019/`,
+            `https://letterboxd.com/film/once-upon-a-time-in-hollywood/`,
+            `https://letterboxd.com/film/rango/`,
+            `https://letterboxd.com/film/mission-impossible-iii/`,
+            `https://letterboxd.com/film/the-lord-of-the-rings-the-return-of-the-king/`,
+            `https://letterboxd.com/film/the-lord-of-the-rings-the-two-towers/`,
+            `https://letterboxd.com/film/the-lord-of-the-rings-the-fellowship-of-the-ring/`,
+            `https://letterboxd.com/film/thoroughbreds-2017/`,
+            `https://letterboxd.com/film/synecdoche-new-york/`,
+            `https://letterboxd.com/film/fantastic-mr-fox/`,
+            `https://letterboxd.com/film/the-silence-of-the-lambs/`,
+            `https://letterboxd.com/film/the-royal-tenenbaums/`,
+            `https://letterboxd.com/film/anomalisa/`,
+            `https://letterboxd.com/film/interstellar/`,
+            `https://letterboxd.com/film/the-prestige/`,
+            `https://letterboxd.com/film/zodiac/`,
+            `https://letterboxd.com/film/there-will-be-blood/`,
+            `https://letterboxd.com/film/paddington-2/`,
+            `https://letterboxd.com/film/inglourious-basterds/`,
+            `https://letterboxd.com/film/kill-bill-vol-1/`,
+            `https://letterboxd.com/film/coco-2017/`,
+            `https://letterboxd.com/film/dead-poets-society/`,
+            `https://letterboxd.com/film/the-iron-giant/`,
+            `https://letterboxd.com/film/coraline/`,
+            `https://letterboxd.com/film/blade-runner-2049/`,
+            `https://letterboxd.com/film/dunkirk-2017/`,
+            `https://letterboxd.com/film/dunkirk-2017/`,
+            `https://letterboxd.com/film/over-the-garden-wall-2014/`,
+            `https://letterboxd.com/film/room-2015/`,
+            `https://letterboxd.com/film/looper/`,
+            `https://letterboxd.com/film/rise-of-the-planet-of-the-apes/`,
+            `https://letterboxd.com/film/american-beauty/`,
+            `https://letterboxd.com/film/arrival-2016/`,
+            `https://letterboxd.com/film/12-angry-men/`,
+            `https://letterboxd.com/film/birdman-or-the-unexpected-virtue-of-ignorance/`,
+            `https://letterboxd.com/film/die-hard/`,
+            `https://letterboxd.com/film/nightcrawler/`,
+            `https://letterboxd.com/film/adventureland/`,
+            `https://letterboxd.com/film/ex-machina-2014/`,
+            `https://letterboxd.com/film/speed-racer/`,
+            `https://letterboxd.com/film/the-grand-budapest-hotel/`,
+            `https://letterboxd.com/film/moonrise-kingdom/`,
+            `https://letterboxd.com/film/eternal-sunshine-of-the-spotless-mind/`,
+            `https://letterboxd.com/film/django-unchained/`,
+            `https://letterboxd.com/film/ratatouille/`,
+            `https://letterboxd.com/film/walle/`,
+            `https://letterboxd.com/film/howls-moving-castle/`,
+            `https://letterboxd.com/film/spirited-away/`,
+            `https://letterboxd.com/film/mad-max-fury-road/`,
+            `https://letterboxd.com/film/the-shawshank-redemption/`,
+            `https://letterboxd.com/film/little-miss-sunshine/`,
+            `https://letterboxd.com/film/district-9/`,
+            `https://letterboxd.com/film/ferris-buellers-day-off/`,
+            `https://letterboxd.com/film/the-truman-show/`,
+            `https://letterboxd.com/film/good-will-hunting/`,
+            `https://letterboxd.com/film/return-of-the-jedi/`,
+            `https://letterboxd.com/film/the-empire-strikes-back/`,
+            `https://letterboxd.com/film/star-wars/`,
+            `https://letterboxd.com/film/the-dark-knight/`,
+            `https://letterboxd.com/film/batman-begins/`,
+            `https://letterboxd.com/film/her/`,
+            `https://letterboxd.com/film/inception/`,
+            `https://letterboxd.com/film/prisoners/`,
+            `https://letterboxd.com/film/the-wolf-of-snow-hollow/`,
+            `https://letterboxd.com/film/monos/`,
+            `https://letterboxd.com/film/the-lighthouse-2019/`,
+            `https://letterboxd.com/film/im-thinking-of-ending-things/`,
+            `https://letterboxd.com/film/millennium-actress/`,
+            `https://letterboxd.com/film/batman-under-the-red-hood/`,
+            `https://letterboxd.com/film/the-good-the-bad-and-the-ugly/`,
+            `https://letterboxd.com/film/booksmart/`,
+            `https://letterboxd.com/film/the-lives-of-others/`,
+            `https://letterboxd.com/film/sorry-to-bother-you/`,
+            `https://letterboxd.com/film/hero-2002/`,
+            `https://letterboxd.com/film/good-time/`,
+            `https://letterboxd.com/film/mary-and-max/`,
+            `https://letterboxd.com/film/megamind/`,
+            `https://letterboxd.com/film/the-hidden-fortress/`,
+            `https://letterboxd.com/film/enemy/`,
+            `https://letterboxd.com/film/rushmore/`,
+            `https://letterboxd.com/film/jojo-rabbit/`,
+            `https://letterboxd.com/film/in-bruges/`,
+            `https://letterboxd.com/film/midnight-in-paris/`,
+            `https://letterboxd.com/film/mission-impossible-fallout/`,
+            `https://letterboxd.com/film/spider-man-into-the-spider-verse/`,
+            `https://letterboxd.com/film/the-incredibles/`,
+            `https://letterboxd.com/film/oldboy/`,
+            `https://letterboxd.com/film/when-marnie-was-there/`,
+            `https://letterboxd.com/film/from-up-on-poppy-hill/`,
+            `https://letterboxd.com/film/whisper-of-the-heart/`,
+            `https://letterboxd.com/film/kikis-delivery-service/`,
+            `https://letterboxd.com/film/nausicaa-of-the-valley-of-the-wind/`,
+            `https://letterboxd.com/film/american-animals/`,
+            `https://letterboxd.com/film/skyfall/`,
+            `https://letterboxd.com/film/no-country-for-old-men/`,
+            `https://letterboxd.com/film/the-endless/`,
+            `https://letterboxd.com/film/isle-of-dogs-2018/`,
+            `https://letterboxd.com/film/robot-frank/`,
+            `https://letterboxd.com/film/back-to-the-future-part-ii/`,
+            `https://letterboxd.com/film/get-out-2017/`,
+            `https://letterboxd.com/film/the-shape-of-water/`,
+            `https://letterboxd.com/film/pulp-fiction/`,
+            `https://letterboxd.com/film/memento/`,
+            `https://letterboxd.com/film/goodfellas/`,
+            `https://letterboxd.com/film/jin-roh-the-wolf-brigade/`,
+            `https://letterboxd.com/film/the-dark-knight-rises/`,
+            `https://letterboxd.com/film/perfect-blue/`,
+            `https://letterboxd.com/film/reservoir-dogs/`,
+            `https://letterboxd.com/film/harry-potter-and-the-prisoner-of-azkaban/`,
+            `https://letterboxd.com/film/airplane/`,
+            `https://letterboxd.com/film/war-for-the-planet-of-the-apes/`,
+            `https://letterboxd.com/film/logan-2017/`,
+            `https://letterboxd.com/film/madagascar-escape-2-africa/`,
+            `https://letterboxd.com/film/dawn-of-the-planet-of-the-apes/`,
+            `https://letterboxd.com/film/scott-pilgrim-vs-the-world/`,
+            `https://letterboxd.com/film/the-book-of-eli/`,
+            `https://letterboxd.com/film/princess-mononoke/`,
+            `https://letterboxd.com/film/guardians-of-the-galaxy/`,
+            `https://letterboxd.com/film/blades-of-glory/`,
+            `https://letterboxd.com/film/napoleon-dynamite/`,
+            `https://letterboxd.com/film/moon/`,
+            `https://letterboxd.com/film/what-we-do-in-the-shadows/`,
+            `https://letterboxd.com/film/star-trek-beyond/`,
+            `https://letterboxd.com/film/where-the-wild-things-are/`,
+            `https://letterboxd.com/film/catch-me-if-you-can-2002/`,
+            `https://letterboxd.com/film/dracula-1992/`,
+            `https://letterboxd.com/film/children-of-men/`,
+            `https://letterboxd.com/film/brother-1997/`,
+            `https://letterboxd.com/film/ernest-celestine/`,
+            `https://letterboxd.com/film/stand-by-me/`,
+            `https://letterboxd.com/film/primer/`,
+            `https://letterboxd.com/film/batman-beyond-return-of-the-joker/`,
+            `https://letterboxd.com/film/brazil/`,
+            `https://letterboxd.com/film/palm-springs-2020/`,
+            `https://letterboxd.com/film/psycho/`,
+            `https://letterboxd.com/film/akira/`,
+            `https://letterboxd.com/film/sunshine-2007/`,
+            `https://letterboxd.com/film/the-worlds-end/`,
+            `https://letterboxd.com/film/black-dynamite/`,
+            `https://letterboxd.com/film/rear-window/`,
+            `https://letterboxd.com/film/uncut-gems/`,
+            `https://letterboxd.com/film/home-alone/`,
+            `https://letterboxd.com/film/home-alone-2-lost-in-new-york/`,
+            `https://letterboxd.com/film/ghost-in-the-shell/`,
+            `https://letterboxd.com/film/castle-in-the-sky/`,
+            `https://letterboxd.com/film/lupin-the-third-the-castle-of-cagliostro/`,
+            `https://letterboxd.com/film/nocturnal-animals/`,
+            `https://letterboxd.com/film/paddington/`,
+            `https://letterboxd.com/film/man-on-the-moon/`,
+            `https://letterboxd.com/film/hail-caesar-2016/`,
+            `https://letterboxd.com/film/how-the-grinch-stole-christmas-2000/`,
+            `https://letterboxd.com/film/murder-on-the-orient-express-2017/`,
+            `https://letterboxd.com/film/the-lost-city-of-z/`,
+            `https://letterboxd.com/film/baby-driver/`,
+            `https://letterboxd.com/film/clue/`,
+            `https://letterboxd.com/film/game-night/`,
+            `https://letterboxd.com/film/national-treasure/`,
+            `https://letterboxd.com/film/the-man-from-earth/`,
+            `https://letterboxd.com/film/pirates-of-the-caribbean-the-curse-of-the-black-pearl/`];
+
+        var recs = [`Silver recommends: `,
+            `This gets the Silver Seal of Approval`,
+            `Now playing on The Silverscreen`]
+
+        var r = Math.floor((Math.random() * movies.length));
+        var r2 = Math.floor((Math.random() * recs.length));
+
+        message.channel.send(recs[r2]+`\n`+movies[r]);
     }
 
     if (command === `ULTRAFIGHTDAKYANTA2LEAGUE`) {
@@ -5331,7 +5938,9 @@ client.on('message', async message => {
                     `No NVM I'm just being racist lmao`,
                     `there's no argument, only streamomentum`,
                     `stream mother is a man of honesty and integrity but only when he says stuff i agree with`,
-                    `Streamo would be hilarious if he was a bot command`];
+                    `Streamo would be hilarious if he was a bot command`,
+                    `the societal pressure that white people feel not to say the n word is of course also felt by black people`,
+                    `I would never murder someone again`];
 
             var r = Math.floor((Math.random() * s.length));
 
@@ -6042,7 +6651,37 @@ client.on('message', async message => {
                     `https://media.discordapp.net/attachments/612058753293877274/735951641152585790/image0.jpg`,
                     `https://media.discordapp.net/attachments/612058753293877274/735537366780870696/JPEG_20200722_124228.jpg`,
                     `https://media.discordapp.net/attachments/612058753293877274/735537814799909045/JPEG_20200722_124434.jpg`,
-                    `https://media.discordapp.net/attachments/612058753293877274/733856883579944970/94365342_1160807907603813_8122387643318140928_o.jpg`];
+                    `https://media.discordapp.net/attachments/612058753293877274/733856883579944970/94365342_1160807907603813_8122387643318140928_o.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760240771461939250/20200928_164518.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760240947341557790/IMG_20200330_124013.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760241188342726746/legocat3.JPG`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760241373571317770/20200924_111819.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760260315186855966/IMG_20200928_180236.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760636988541108304/image0.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760636966021758996/image0.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760637459271909386/20200921_204713.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760639126969516052/IMG_20200806_220110460.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760993521183883306/image0.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/760997426940739614/123_11.jpeg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/762264302647771156/IMG_20201004_114557332.jpg`,
+                    `https://media.discordapp.net/attachments/612061766830260244/763779049456926750/20201008_110511.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/764570291115524146/20201010_152916.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/764578302773559306/20201010_160012.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/767126044670689330/JPEG_20201017_134447.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/768324151521574942/image0.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/769725579644895263/123_19.jpeg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/771761519964192778/20201030_114440.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/773357353269067796/20201103_202549.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/773356556829720626/IMG_8531.JPG`,
+                    `https://media.discordapp.net/attachments/612061198288027796/773388295324827650/image0-36.png`,
+                    `https://media.discordapp.net/attachments/612058753293877274/777178166733176863/123_114.jpeg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/776760255358828545/20201113_104736.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/776641673039708170/20201112_215458.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/776086567773011999/20201111_091042.jpg`,
+                    `https://media.discordapp.net/attachments/612061766830260244/779399230485168148/20201119_113930.jpg`,
+                    `https://media.discordapp.net/attachments/612061766830260244/779399245253836800/20201119_113927.jpg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/779763449529499698/123_116.jpeg`,
+                    `https://media.discordapp.net/attachments/612058753293877274/779788843821695006/IMG_8937.jpg`];
 
             var r = Math.floor((Math.random() * m.length));
 
@@ -6056,6 +6695,11 @@ client.on('message', async message => {
 
             message.channel.send(h[r]);
         }
+    }
+
+    //Turgle
+    if (command === `TURGLE`) {
+        message.channel.send({file: 'https://cdn.discordapp.com/attachments/612065359285059615/774630944748339210/unknown.png'});
     }
 
     //Wub Wub Wowzy
@@ -6433,7 +7077,7 @@ client.on('message', async message => {
                 if (users[9]) var tenthplace = await client.fetchUser(users[9].userid);
                 if (users[21]) var twentysecondplace = await client.fetchUser(users[21].userid);
 
-                message.channel.send(`**Candy Leaderboard**
+                var output = `**Candy Leaderboard**
 1 - ${firstplace && message.guild.member(firstplace).displayName || 'Nobody Yet'}: ${users[0] && users[0].level || '0'}
 2 - ${secondplace && message.guild.member(secondplace).displayName || 'Nobody Yet'}: ${users[1] && users[1].level || '0'}
 3 - ${thirdplace && message.guild.member(thirdplace).displayName || 'Nobody Yet'}: ${users[2] && users[2].level || '0'}
@@ -6443,8 +7087,12 @@ client.on('message', async message => {
 7 - ${seventhplace && message.guild.member(seventhplace).displayName || 'Nobody Yet'}: ${users[6] && users[6].level || '0'}
 8 - ${eighthplace && message.guild.member(eighthplace).displayName || 'Nobody Yet'}: ${users[7] && users[7].level || '0'}
 9 - ${ninthplace && message.guild.member(ninthplace).displayName || 'Nobody Yet'}: ${users[8] && users[8].level || '0'}
-10 - ${tenthplace && message.guild.member(tenthplace).displayName || 'Nobody Yet'}: ${users[9] && users[9].level || '0'}
-22 - ${twentysecondplace && message.guild.member(twentysecondplace).displayName || 'Nobody Yet'}: ${users[21] && users[21].level || '0'}`)
+10 - ${tenthplace && message.guild.member(tenthplace).displayName || 'Nobody Yet'}: ${users[9] && users[9].level || '0'}`;
+
+                if (users[21].userid == 175333417481666571) output += `\n22 - stupid fucking bitch: ${users[21] && users[21].level || '0'}`;
+                else output += `\n22 - ${twentysecondplace && message.guild.member(twentysecondplace).displayName || 'Nobody Yet'}: ${users[21] && users[21].level || '0'}`;
+
+                message.channel.send(output)
             })
         } else if (board === 'halloween2020full') {
             if(message.channel.id != 612065359285059615) {
@@ -6484,7 +7132,100 @@ client.on('message', async message => {
                 if (users[28]) var place29 = await client.fetchUser(users[28].userid);
                 if (users[29]) var place30 = await client.fetchUser(users[29].userid);
 
-                message.channel.send(`**Candy Leaderboard**
+                var output = `**Candy Leaderboard**\n`;
+
+                if(users[0].userid == 175333417481666571) output += `1 - stupid fucking bitch: ${users[0] && users[0].level || '0'}\n`;
+                else output += `1 - ${firstplace && message.guild.member(firstplace).displayName || 'Nobody Yet'}: ${users[0] && users[0].level || '0'}\n`;
+
+                if(users[1].userid == 175333417481666571) output += `2 - stupid fucking bitch: ${users[1] && users[1].level || '0'}\n`;
+                else output += `2 - ${secondplace && message.guild.member(secondplace).displayName || 'Nobody Yet'}: ${users[1] && users[1].level || '0'}\n`;
+
+                if(users[2].userid == 175333417481666571) output += `3 - stupid fucking bitch: ${users[2] && users[2].level || '0'}\n`;
+                else output += `3 - ${thirdplace && message.guild.member(thirdplace).displayName || 'Nobody Yet'}: ${users[2] && users[2].level || '0'}\n`;
+
+                if(users[3].userid == 175333417481666571) output += `4 - stupid fucking bitch: ${users[3] && users[3].level || '0'}\n`;
+                else output += `4 - ${fourthplace && message.guild.member(fourthplace).displayName || 'Nobody Yet'}: ${users[3] && users[3].level || '0'}\n`;
+
+                if(users[4].userid == 175333417481666571) output += `5 - stupid fucking bitch: ${users[4] && users[4].level || '0'}\n`;
+                else output += `5 - ${fifthplace && message.guild.member(fifthplace).displayName || 'Nobody Yet'}: ${users[4] && users[4].level || '0'}\n`;
+
+                if(users[5].userid == 175333417481666571) output += `6 - stupid fucking bitch: ${users[5] && users[5].level || '0'}\n`;
+                else output += `6 - ${sixthplace && message.guild.member(sixthplace).displayName || 'Nobody Yet'}: ${users[5] && users[5].level || '0'}\n`;
+
+                if(users[6].userid == 175333417481666571) output += `7 - stupid fucking bitch: ${users[6] && users[6].level || '0'}\n`;
+                else output += `7 - ${seventhplace && message.guild.member(seventhplace).displayName || 'Nobody Yet'}: ${users[6] && users[6].level || '0'}\n`;
+
+                if(users[7].userid == 175333417481666571) output += `8 - stupid fucking bitch: ${users[7] && users[7].level || '0'}\n`;
+                else output += `8 - ${eighthplace && message.guild.member(eighthplace).displayName || 'Nobody Yet'}: ${users[7] && users[7].level || '0'}\n`;
+
+                if(users[8].userid == 175333417481666571) output += `9 - stupid fucking bitch: ${users[8] && users[8].level || '0'}\n`;
+                else output += `9 - ${ninthplace && message.guild.member(ninthplace).displayName || 'Nobody Yet'}: ${users[8] && users[8].level || '0'}\n`;
+
+                if(users[9].userid == 175333417481666571) output += `10 - stupid fucking bitch: ${users[9] && users[9].level || '0'}\n`;
+                else output += `10 - ${tenthplace && message.guild.member(tenthplace).displayName || 'Nobody Yet'}: ${users[9] && users[9].level || '0'}\n`;
+
+                if(users[10].userid == 175333417481666571) output += `11 - stupid fucking bitch: ${users[10] && users[10].level || '0'}\n`;
+                else output += `11 - ${place11 && message.guild.member(place11).displayName || 'Nobody Yet'}: ${users[10] && users[10].level || '0'}\n`;
+
+                if(users[11].userid == 175333417481666571) output += `12 - stupid fucking bitch: ${users[11] && users[11].level || '0'}\n`;
+                else output += `12 - ${place12 && message.guild.member(place12).displayName || 'Nobody Yet'}: ${users[11] && users[11].level || '0'}\n`;
+
+                if(users[12].userid == 175333417481666571) output += `13 - stupid fucking bitch: ${users[12] && users[12].level || '0'}\n`;
+                else output += `13 - ${place13 && message.guild.member(place13).displayName || 'Nobody Yet'}: ${users[12] && users[12].level || '0'}\n`;
+
+                if(users[13].userid == 175333417481666571) output += `14 - stupid fucking bitch: ${users[13] && users[13].level || '0'}\n`;
+                else output += `14 - ${place14 && message.guild.member(place14).displayName || 'Nobody Yet'}: ${users[13] && users[13].level || '0'}\n`;
+
+                if(users[14].userid == 175333417481666571) output += `15 - stupid fucking bitch: ${users[14] && users[14].level || '0'}\n`;
+                else output += `15 - ${place15 && message.guild.member(place15).displayName || 'Nobody Yet'}: ${users[14] && users[14].level || '0'}\n`;
+
+                if(users[15].userid == 175333417481666571) output += `16 - stupid fucking bitch: ${users[15] && users[15].level || '0'}\n`;
+                else output += `16 - ${place16 && message.guild.member(place16).displayName || 'Nobody Yet'}: ${users[15] && users[15].level || '0'}\n`;
+
+                if(users[16].userid == 175333417481666571) output += `17 - stupid fucking bitch: ${users[16] && users[16].level || '0'}\n`;
+                else output += `17 - ${place17 && message.guild.member(place17).displayName || 'Nobody Yet'}: ${users[16] && users[16].level || '0'}\n`;
+
+                if(users[17].userid == 175333417481666571) output += `18 - stupid fucking bitch: ${users[17] && users[17].level || '0'}\n`;
+                else output += `18 - ${place18 && message.guild.member(place18).displayName || 'Nobody Yet'}: ${users[17] && users[17].level || '0'}\n`;
+
+                if(users[18].userid == 175333417481666571) output += `19 - stupid fucking bitch: ${users[18] && users[18].level || '0'}\n`;
+                else output += `19 - ${place19 && message.guild.member(place19).displayName || 'Nobody Yet'}: ${users[18] && users[18].level || '0'}\n`;
+
+                if(users[19].userid == 175333417481666571) output += `20 - stupid fucking bitch: ${users[19] && users[19].level || '0'}\n`;
+                else output += `20 - ${place20 && message.guild.member(place20).displayName || 'Nobody Yet'}: ${users[19] && users[19].level || '0'}\n`;
+
+                if(users[20].userid == 175333417481666571) output += `21 - stupid fucking bitch: ${users[20] && users[20].level || '0'}\n`;
+                else output += `21 - ${place21 && message.guild.member(place21).displayName || 'Nobody Yet'}: ${users[20] && users[20].level || '0'}\n`;
+
+                if(users[21].userid == 175333417481666571) output += `22 - stupid fucking bitch: ${users[21] && users[21].level || '0'}\n`;
+                else output += `22 - ${twentysecondplace && message.guild.member(twentysecondplace).displayName || 'Nobody Yet'}: ${users[21] && users[21].level || '0'}\n`;
+
+                if(users[22].userid == 175333417481666571) output += `23 - stupid fucking bitch: ${users[22] && users[22].level || '0'}\n`;
+                else output += `23 - ${place23 && message.guild.member(place23).displayName || 'Nobody Yet'}: ${users[22] && users[22].level || '0'}\n`;
+
+                if(users[23].userid == 175333417481666571) output += `24 - stupid fucking bitch: ${users[23] && users[23].level || '0'}\n`;
+                else output += `24 - ${place24 && message.guild.member(place24).displayName || 'Nobody Yet'}: ${users[23] && users[23].level || '0'}\n`;
+
+                if(users[24].userid == 175333417481666571) output += `25 - stupid fucking bitch: ${users[24] && users[24].level || '0'}\n`;
+                else output += `25 - ${place25 && message.guild.member(place25).displayName || 'Nobody Yet'}: ${users[24] && users[24].level || '0'}\n`;
+
+                if(users[25].userid == 175333417481666571) output += `26 - stupid fucking bitch: ${users[25] && users[25].level || '0'}\n`;
+                else output += `26 - ${place26 && message.guild.member(place26).displayName || 'Nobody Yet'}: ${users[25] && users[25].level || '0'}\n`;
+
+                if(users[26].userid == 175333417481666571) output += `27 - stupid fucking bitch: ${users[26] && users[26].level || '0'}\n`;
+                else output += `27 - ${place27 && message.guild.member(place27).displayName || 'Nobody Yet'}: ${users[26] && users[26].level || '0'}\n`;
+
+                if(users[27].userid == 175333417481666571) output += `28 - stupid fucking bitch: ${users[27] && users[27].level || '0'}\n`;
+                else output += `28 - ${place28 && message.guild.member(place28).displayName || 'Nobody Yet'}: ${users[27] && users[27].level || '0'}\n`;
+
+                if(users[28].userid == 175333417481666571) output += `29 - stupid fucking bitch: ${users[28] && users[28].level || '0'}\n`;
+                else output += `29 - ${place29 && message.guild.member(place29).displayName || 'Nobody Yet'}: ${users[28] && users[28].level || '0'}\n`;
+
+                if(users[29].userid == 175333417481666571) output += `30 - stupid fucking bitch: ${users[29] && users[29].level || '0'}\n`;
+                else output += `30 - ${place30 && message.guild.member(place30).displayName || 'Nobody Yet'}: ${users[29] && users[29].level || '0'}\n`;
+
+                message.channel.send(output);
+                /*message.channel.send(`**Candy Leaderboard**
 1 - ${firstplace && message.guild.member(firstplace).displayName || 'Nobody Yet'}: ${users[0] && users[0].level || '0'}
 2 - ${secondplace && message.guild.member(secondplace).displayName || 'Nobody Yet'}: ${users[1] && users[1].level || '0'}
 3 - ${thirdplace && message.guild.member(thirdplace).displayName || 'Nobody Yet'}: ${users[2] && users[2].level || '0'}
@@ -6514,7 +7255,7 @@ client.on('message', async message => {
 27 - ${place27 && message.guild.member(place27).displayName || 'Nobody Yet'}: ${users[26] && users[26].level || '0'}
 28 - ${place28 && message.guild.member(place28).displayName || 'Nobody Yet'}: ${users[27] && users[27].level || '0'}
 29 - ${place29 && message.guild.member(place29).displayName || 'Nobody Yet'}: ${users[28] && users[28].level || '0'}
-30 - ${place30 && message.guild.member(place30).displayName || 'Nobody Yet'}: ${users[29] && users[29].level || '0'}`)
+30 - ${place30 && message.guild.member(place30).displayName || 'Nobody Yet'}: ${users[29] && users[29].level || '0'}`)*/
             })
             //await lvl.Leaderboard({ /*limit: 10*/ }).then(async users => {
             //    var outputMessage = `**Candy Leaderboard**\n`;
@@ -7175,7 +7916,7 @@ client.on('message', async message => {
     }
 
     if (command === `REWARD` || command === `PRIZE` || command === `GIMME`) {
-        var profile = await lvl.Fetch(message.author.id);
+        /*var profile = await lvl.Fetch(message.author.id);
 
         if (profile.xp == 1) {
             await lvl.SetXp(message.author.id, 2); //Set as claimed
@@ -7187,6 +7928,21 @@ client.on('message', async message => {
                 .addField(currencyName, `${results.newbalance}`, true)
             message.channel.send({embed});
         } else if (profile.xp == 2) {
+            message.channel.send(`Sorry, you've already claimed your reward.`);
+        }*/
+
+        var profile = await candy2020.Fetch(message.author.id);
+
+        if (profile.xp != 5) {
+            await candy2020.SetXp(message.author.id, 5); //Set as claimed
+            var results = await eco.AddToBalance(message.author.id, profile.level); //Give level to them in sbux
+
+            const embed = new Discord.RichEmbed() //Send message
+                .setTitle(`${message.member.displayName}\'s Balance`)
+                .setColor(0xF1C40F)
+                .addField(currencyName, `${results.newbalance}`, true)
+            message.channel.send({embed});
+        } else if (profile.xp == 5) {
             message.channel.send(`Sorry, you've already claimed your reward.`);
         }
     }
@@ -7274,7 +8030,12 @@ client.on('message', async message => {
         message.channel.send('Fixed.');
     }
 
-    if (command === `JACKPOT`) {
+    if (command === `FUCKCUCK`) {
+        await candy2020.Delete(175333417481666571);
+        message.channel.send('Fuck cuck.');
+    }
+
+    if (command === `JACKPOT` || command === `JACKY`) {
         var timbot = await candy2020.Fetch(608819901943119882);
         var currentJackpot = timbot.xp
         message.channel.send('🍬The jackpot is currently at ' + currentJackpot + ' candies!🍬');
