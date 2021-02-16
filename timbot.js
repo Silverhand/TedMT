@@ -10,6 +10,9 @@ const msglvl = require("discord-leveling-2");
 const snowlvl = require("discord-leveling-3");
 const ecolvl = require("discord-leveling-4");
 const candy2020 = require("discord-leveling-5");
+const xmas2020 = require("discord-leveling-6");
+const mxdc2020 = require ("discord-leveling-7");
+const sdgc2020 = require ("discord-leveling-8");
 const MarkovGen = require("markov-generator");
 const Scrambo = require("scrambo");
 const cube = new Scrambo();
@@ -17,6 +20,7 @@ const client = new Discord.Client();
 const modRole = 'Bot Admin';
 const bankRole = 'Loan Shark';
 const banRole = 'useless bitch';
+const verifierRole = 'Verifier';
 const triggeredCandyRecently = new Set();
 var jackpotCounter = 100;
 const sql = require('sqlite');
@@ -24,13 +28,13 @@ sql.open('Storage/userData.sqlite');
 
 //Initialization
 client.on('ready', () => {
-    console.log('TimBot v1.9.0 Launched');
+    console.log('TimBot v1.10.1 Launched');
 
     client.user.setActivity("with Sunny :)", { type: "PLAYING" });
 })
 
 //Starboard
-client.on('messageReactionAdd', async (reaction, user) => {
+/*client.on('messageReactionAdd', async (reaction, user) => {
     var message = reaction.message;
     var emoji = reaction.emoji;
 
@@ -80,7 +84,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         .setImage(image);
       await starChannel.send({ embed });
     }
-})
+})*/
 
 //Listener
 client.on('message', async message => {
@@ -90,6 +94,9 @@ client.on('message', async message => {
     var prefixAlt = '!';
     var prefix2 = 'S!';
     var sender = message.author;
+
+    //Christmas Event Initialization
+    await xmas2020.SetXp(message.author.id, 1);
 
     if (msg.startsWith(prefixAlt) || msg.startsWith(prefix) || msg.startsWith(prefix2)) {
         if (sender.id == 1) {
@@ -411,6 +418,11 @@ client.on('message', async message => {
     }
 
     if (command === `ROLL` || command === `DEATHROLL`) {
+        if (sender.id == 175333417481666571) {
+            message.channel.send(':skull: :one: :skull:');
+            return;
+        }
+
         var max = 100;
         var min = 1;
 
@@ -459,11 +471,12 @@ client.on('message', async message => {
     //Patch Notes
     if (command === `PATCHNOTES` || command === `PATCH` || command === `UPDATE`) {
         const embed = new Discord.RichEmbed()
-        //1.6.0 on 1/26/20, 1.6.1 on 1/29/20, 1.6.2 on 2/09/20, 1.7.0 on 3/13/20, 1.7.1 on 3/31/20, 1.7.2 on 4/04/20, 1.7.3 on 4/23/20, 1.7.4 on 5/06/20, 1.7.5 on 5/18/20, 1.8 on 7/18/20, 1.9 on 10/01/20
-            .setTitle(`TimBot v1.10.0 Patch Notes 11/28/20`)
+        //1.6.0 on 1/26/20, 1.6.1 on 1/29/20, 1.6.2 on 2/09/20, 1.7.0 on 3/13/20, 1.7.1 on 3/31/20, 1.7.2 on 4/04/20, 1.7.3 on 4/23/20, 1.7.4 on 5/06/20, 1.7.5 on 5/18/20, 1.8 on 7/18/20, 1.9 on 10/01/20, 1.10 on 11/28/20
+            .setTitle(`TimBot v1.10.1 Patch Notes 12/01/20, Christmas Event Edition`)
             .setColor(0xfdfdfd) //0x2d64f1
+            .addField(`Christmas Event`, `New Christmas event this year, use !event for details!`, true)
             .addField(`!crab`, `!present/!gift limited time command, thanks to restingcarcass!`, true)
-            .addField(`!quote`, `Added 105 new quotes, none of which were "Darsh is right"`, true)
+            .addField(`!quote`, `Added 109 new quotes, none of which were "Darsh is right"`, true)
             .addField(`!quote`, `Removed 'darsh is right' from the quote pool`, true)
             .addField(`!comic`, `Added 19 new comics`, true)
             .addField(`!tcle`, `Added 35 new memes`, true)
@@ -528,7 +541,7 @@ client.on('message', async message => {
 
 
     //General
-    if (command === `QUOTE` || command === `Q` || command === `NEWQUOTE` || command === `NEWQ` || command === `NQ` || command === `TRUE`) {
+    if (command === `QUOTE` || command === `Q` || command === `NEWQUOTE` || command === `NEWQ` || command === `NQ` || command === `TRUE` || command === `TENET`) {
         var quotes = [`What's your favorite minecraft block?`,
             `You lack a fundamental understanding of literature if you ever slightly enjoyed the character of Taylor`,
             `Puff is too high`,
@@ -1756,25 +1769,48 @@ client.on('message', async message => {
             `You can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce\nYou can't star a bot message, you dunce`,
             `I feel raw, like an uncooked patty`,
             `I think I have solved peach/kirby`,
-            `I think I have solved world fullness`];
+            `I think I have solved world fullness`,
+            `they are sexually goo`,
+            `Are you punning or gunning`,
+            `die hard is just a christmas episode of life's great big action movie`,
+            `3 mains and you don't believe in the age of consent? you're playing the wrong game brother`];
 
-        if (command === `NEWQUOTE` || command === `NEWQ` || command === `NQ`) {
-            var min = (quotes.length - 105); //default 100
-            var max = quotes.length;
-            var r = Math.floor(Math.random() * (max - min + 1)) + min;
-        } else {
+        if (command === `TENET`) {
             var r = Math.floor((Math.random() * quotes.length));
-        }
+            var quoteSelected = quotes[r];
+            var splitString = quoteSelected.split("");
+            var reverseArray = splitString.reverse();
+            var joinArray = reverseArray.join("");
 
-        message.channel.send(quotes[r]);
+            message.channel.send(joinArray);
+        } else {
+            if (command === `NEWQUOTE` || command === `NEWQ` || command === `NQ`) {
+                var min = (quotes.length - 109); //default 100
+                var max = quotes.length;
+                var r = Math.floor(Math.random() * (max - min + 1)) + min;
+            } else {
+                var r = Math.floor((Math.random() * quotes.length));
+            }
+
+            message.channel.send(quotes[r]);
+        }
     }
 
     //Crab
-    if (command === `CRAB` || command === `CRABE` || command === `PRESENT` || command === `GIFT`/*|| command === `TURKEY`*//*|| command === `PUMPKIN`*/) {
+    if (command === `CRAB` || command === `CRABE` || command === `CHAMPAGNE` /*|| command === `PRESENT` || command === `GIFT`/*|| command === `TURKEY`*//*|| command === `PUMPKIN`*/) {
+        if (sender.id == 175333417481666571) {
+            const embed = new Discord.RichEmbed()
+                .setTitle(`Congratulations! You won nothing, fuck you`)
+                .setColor(0xF1C40F)
+                .addField(`${currencyName}`, `0`, true)
+            message.channel.send({embed});
+            return;
+        }
+
         var daily = await eco.Daily(sender.id);
 
         if (daily.updated) {
-            /*var c = [`the crab hits your face`,
+            var c = [`the crab hits your face`,
                     `the crab hits your face`,
                     `the crab grabs onto your arm and pinches it as it flies by`,
                     `the crab grabs onto your arm and pinches it as it flies by`,
@@ -1789,7 +1825,25 @@ client.on('message', async message => {
                     `you are not a puff main and your superior reflexes allow you to catch the crab`,
                     `you are not a puff main and your superior reflexes allow you to catch the crab`,
                     `the crab reverse fadeback fairs you`,
-                    `you use your copious amount of tech skill practice to jc crab and escape`];*/
+                    `you use your copious amount of tech skill practice to jc crab and escape`];
+
+            //New Years
+            /*var c = [`you pop the champagne and lean in to kiss your crush, who dives out of the way`,
+                    `you pop the champagne and lean in to kiss your crush, who dives out of the way`,
+                    `you pop the non-alcoholic sparkling wine and sit down at the kids table while all the adults have fun outside`,
+                    `you pop the non-alcoholic sparkling wine and sit down at the kids table while all the adults have fun outside`,
+                    `you pop the champagne and sign up for Planet Fitness`,
+                    `you pop the champagne and sign up for Planet Fitness`,
+                    `you pop the champagne and decide to finally stop procrastinating! right after this last game of Dota...`,
+                    `you pop the champagne and decide to finally stop procrastinating! right after this last game of Dota...`,
+                    `you pop the champagne and put down the mango-mint Juul; it's time to kick this nicotine habit`,
+                    `you pop the champagne and put down the mango-mint Juul; it's time to kick this nicotine habit`,
+                    `you pop the champagne and join your local anime club`,
+                    `you pop the champagne and join your local anime club`,
+                    `you pop the champagne and decide to stop doom scrolling on Twitter`,
+                    `you pop the champagne and decide to stop doom scrolling on Twitter`,
+                    `you pop the champagne and commit to waking up before noon on the weekends`,
+                    `you pop the champagne and start up your first game of unranked for the new year`];*/
 
             //Halloween
             /*var c = [`the pumpkin smashes on your face and leaves you covered in pumpkin goop`,
@@ -1828,7 +1882,7 @@ client.on('message', async message => {
                     `the turkey lands in your cornucopia, giving you a free thanksgiving dinner`];*/
 
             //Christmas
-            var c = [`you flub frame-perfectly opening the present and receive chronic hand pain`,
+            /*var c = [`you flub frame-perfectly opening the present and receive chronic hand pain`,
                     `you flub frame-perfectly opening the present and receive chronic hand pain`,
                     `you open the present and receive a signed headshot of Hbox`,
                     `you open the present and receive a brand new copy of Super Smash Bros. for Wii U`,
@@ -1843,7 +1897,7 @@ client.on('message', async message => {
                     `you open the present and receive a signed copy of Hugo's "How to pick up women (that are taller than you)"`,
                     `you open the present and receive a new gamecube controller with all the notches`,
                     `you open the present and receive a sweater made with love in every stitch`,
-                    `you open the present and receive a brand new gamecube! something is rattling on the inside...you open it up and find a giant wad of cash! and buried in that wad of cash is a brand new N64!`];
+                    `you open the present and receive a brand new gamecube! something is rattling on the inside...you open it up and find a giant wad of cash! and buried in that wad of cash is a brand new N64!`];*/
 
             var r = Math.floor((Math.random() * c.length));
 
@@ -2021,6 +2075,7 @@ client.on('message', async message => {
                 .addField('1/02', `Risc's Birthday`, true)
                 .addField('1/09', `Cagliostro's Birthday`, true)
                 .addField('1/09', `Cuck Daddy's Birthday`, true)
+                .addField('1/09', `Icemaster's Birthday`, true)
                 .addField('1/10', `Silverhand's Birthday`, true)
                 .addField('1/17', `TISHD`, true)
                 .addField('1/27', `Stream Mommy Agreed with Someone`, true)
@@ -2634,7 +2689,7 @@ client.on('message', async message => {
             `Bird Spouses - Rog\nhttps://cdn.discordapp.com/attachments/608818247877525526/672650364046147594/unknown.png`, //25
             `Bird Spouses - Silver\nhttps://cdn.discordapp.com/attachments/612058753293877274/641737676273352725/c19fe0e9-1569-4e68-9e78-23982f691ce5.png`,
             `Selfie Blasters - Silver\nhttps://cdn.discordapp.com/attachments/612058753293877274/641723955664650243/8fae1bbf-6025-4e6c-827a-4da81c7e5a5e.png`,
-            `How Good People Actually are at Melee - Crowdfunded\nhttps://cdn.discordapp.com/attachments/612061766830260244/668817072054206464/a80ba2df-f00d-4322-abc2-6b10a83d49a4.png`,
+            `How Good People Actually are at Melee - Crowdfunded\nhttps://media.discordapp.net/attachments/612061766830260244/763903358674796544/unknown.png`,
             `Legs - Rog\nhttps://cdn.discordapp.com/attachments/612058753293877274/641419566458732557/20191105_183423.jpg`,
             `Cute PFPs - Rog\nhttps://cdn.discordapp.com/attachments/612058753293877274/641416615765868571/20191105_182248.jpg`, //30
             `PFPs - Silver\nhttps://cdn.discordapp.com/attachments/612058753293877274/641404980498268173/4f201937-4c2c-4ed7-ac6e-9ef09e2603fd.png`,
@@ -3931,7 +3986,7 @@ client.on('message', async message => {
         const embed = new Discord.RichEmbed()
             .setTitle(`CumCoin`)
             .setColor(0xFFFFFF)
-            .addField(`Darsh's CumCoin`, `20000`, true)
+            .addField(`Carcass's CumCoin`, `20000`, true)
             .addField(`Loscar's Cumcoin`, `20001`, true)
         message.channel.send({embed});
     }
@@ -7027,7 +7082,15 @@ client.on('message', async message => {
                 board = 'halloween2020';
             } else if (args[0] === `MESSAGE` || args[0] === `MESSAGES` || args[0] === `MSG` || args[0] === `MSGS`) {
                 board = 'messages';
-            } else if (args[0] === `SNOW` || args[0] === `SNOWBALL` || args[0] === `SNOWBALLS` || args[0] === `CHRISTMAS` || args[0] === `XMAS` || args[0] === `EVENT`) {
+            } else if (args[0] === `CHRISTMASFULL` || args[0] === `XMASFULL` || args[0] === `ADVENTFULL` || args[0] === `EVENTFULL` || (args[0] === `CHRISTMAS` && args[1] === `FULL`) || (args[0] === `XMAS` && args[1] === `FULL`) || (args[0] === `ADVENT` && args[1] === `FULL`) || (args[0] === `EVENT` && args[1] === `FULL`) ) {
+                board = 'xmas2020full';
+            } else if (args[0] === `CHRISTMAS` || args[0] === `XMAS` || args[0] === `ADVENT` || args[0] === `EVENT`) {
+                board = 'xmas2020';
+            } else if (args[0] === `MXD` || args[0] === `MXDC` || args[0] === `DARSH` || args[0] === `DARSHEVENT`) {
+                board = 'mxdc2020';
+            } else if (args[0] === `SDGC` || args[0] === `DRAX` || args[0] === `DRAXEVENT` || args[0] === `SUMDGC3K`) {
+                board = 'sdgc2020';
+            } else if (args[0] === `SNOW` || args[0] === `SNOWBALL` || args[0] === `SNOWBALLS` || args[0] === `CHRISTMASOLD` || args[0] === `XMASOLD`) {
                 board = 'christmas';
             } else if (args[0] === `TIMCOIN` || args[0] === `TC` || args[0] === `MONEY` || args[0] === `BALANCE`) {
                 board = 'timcoin';
@@ -7267,6 +7330,160 @@ client.on('message', async message => {
             //    })
             //    message.channel.send(outputMessage);
             //})
+        } else if (board === 'xmas2020full') {
+            if(message.channel.id != 612065359285059615) {
+                message.channel.send('That is only allowed in #bot-commands');
+                return;
+            }
+            await xmas2020.Leaderboard({ /*limit: 10*/ }).then(async users => {
+                console.log(users);
+                if (users[0]) var firstplace = await client.fetchUser(users[0].userid);
+                if (users[1]) var secondplace = await client.fetchUser(users[1].userid);
+                if (users[2]) var thirdplace = await client.fetchUser(users[2].userid);
+                if (users[3]) var fourthplace = await client.fetchUser(users[3].userid);
+                if (users[4]) var fifthplace = await client.fetchUser(users[4].userid);
+                if (users[5]) var sixthplace = await client.fetchUser(users[5].userid);
+                if (users[6]) var seventhplace = await client.fetchUser(users[6].userid);
+                if (users[7]) var eighthplace = await client.fetchUser(users[7].userid);
+                if (users[8]) var ninthplace = await client.fetchUser(users[8].userid);
+                if (users[9]) var tenthplace = await client.fetchUser(users[9].userid);
+                if (users[10]) var place11 = await client.fetchUser(users[10].userid);
+                if (users[11]) var place12 = await client.fetchUser(users[11].userid);
+                if (users[12]) var place13 = await client.fetchUser(users[12].userid);
+                if (users[13]) var place14 = await client.fetchUser(users[13].userid);
+                if (users[14]) var place15 = await client.fetchUser(users[14].userid);
+                if (users[15]) var place16 = await client.fetchUser(users[15].userid);
+                if (users[16]) var place17 = await client.fetchUser(users[16].userid);
+                if (users[17]) var place18 = await client.fetchUser(users[17].userid);
+                if (users[18]) var place19 = await client.fetchUser(users[18].userid);
+                if (users[19]) var place20 = await client.fetchUser(users[19].userid);
+                if (users[20]) var place21 = await client.fetchUser(users[20].userid);
+                if (users[21]) var twentysecondplace = await client.fetchUser(users[21].userid);
+                if (users[22]) var place23 = await client.fetchUser(users[22].userid);
+                if (users[23]) var place24 = await client.fetchUser(users[23].userid);
+                if (users[24]) var place25 = await client.fetchUser(users[24].userid);
+                if (users[25]) var place26 = await client.fetchUser(users[25].userid);
+                if (users[26]) var place27 = await client.fetchUser(users[26].userid);
+                if (users[27]) var place28 = await client.fetchUser(users[27].userid);
+                if (users[28]) var place29 = await client.fetchUser(users[28].userid);
+                if (users[29]) var place30 = await client.fetchUser(users[29].userid);
+
+                message.channel.send(`**Christmas Event Leaderboard**
+1 - ${firstplace && message.guild.member(firstplace).displayName || 'Nobody Yet'}: ${users[0] && users[0].level || '0'}
+2 - ${secondplace && message.guild.member(secondplace).displayName || 'Nobody Yet'}: ${users[1] && users[1].level || '0'}
+3 - ${thirdplace && message.guild.member(thirdplace).displayName || 'Nobody Yet'}: ${users[2] && users[2].level || '0'}
+4 - ${fourthplace && message.guild.member(fourthplace).displayName || 'Nobody Yet'}: ${users[3] && users[3].level || '0'}
+5 - ${fifthplace && message.guild.member(fifthplace).displayName || 'Nobody Yet'}: ${users[4] && users[4].level || '0'}
+6 - ${sixthplace && message.guild.member(sixthplace).displayName || 'Nobody Yet'}: ${users[5] && users[5].level || '0'}
+7 - ${seventhplace && message.guild.member(seventhplace).displayName || 'Nobody Yet'}: ${users[6] && users[6].level || '0'}
+8 - ${eighthplace && message.guild.member(eighthplace).displayName || 'Nobody Yet'}: ${users[7] && users[7].level || '0'}
+9 - ${ninthplace && message.guild.member(ninthplace).displayName || 'Nobody Yet'}: ${users[8] && users[8].level || '0'}
+10 - ${tenthplace && message.guild.member(tenthplace).displayName || 'Nobody Yet'}: ${users[9] && users[9].level || '0'}
+11 - ${place11 && message.guild.member(place11).displayName || 'Nobody Yet'}: ${users[10] && users[10].level || '0'}
+12 - ${place12 && message.guild.member(place12).displayName || 'Nobody Yet'}: ${users[11] && users[11].level || '0'}
+13 - ${place13 && message.guild.member(place13).displayName || 'Nobody Yet'}: ${users[12] && users[12].level || '0'}
+14 - ${place14 && message.guild.member(place14).displayName || 'Nobody Yet'}: ${users[13] && users[13].level || '0'}
+15 - ${place15 && message.guild.member(place15).displayName || 'Nobody Yet'}: ${users[14] && users[14].level || '0'}
+16 - ${place16 && message.guild.member(place16).displayName || 'Nobody Yet'}: ${users[15] && users[15].level || '0'}
+17 - ${place17 && message.guild.member(place17).displayName || 'Nobody Yet'}: ${users[16] && users[16].level || '0'}
+18 - ${place18 && message.guild.member(place18).displayName || 'Nobody Yet'}: ${users[17] && users[17].level || '0'}
+19 - ${place19 && message.guild.member(place19).displayName || 'Nobody Yet'}: ${users[18] && users[18].level || '0'}
+20 - ${place20 && message.guild.member(place20).displayName || 'Nobody Yet'}: ${users[19] && users[19].level || '0'}
+21 - ${place21 && message.guild.member(place21).displayName || 'Nobody Yet'}: ${users[20] && users[20].level || '0'}
+22 - ${twentysecondplace && message.guild.member(twentysecondplace).displayName || 'Nobody Yet'}: ${users[21] && users[21].level || '0'}
+23 - ${place23 && message.guild.member(place23).displayName || 'Nobody Yet'}: ${users[22] && users[22].level || '0'}
+24 - ${place24 && message.guild.member(place24).displayName || 'Nobody Yet'}: ${users[23] && users[23].level || '0'}
+25 - ${place25 && message.guild.member(place25).displayName || 'Nobody Yet'}: ${users[24] && users[24].level || '0'}
+26 - ${place26 && message.guild.member(place26).displayName || 'Nobody Yet'}: ${users[25] && users[25].level || '0'}
+27 - ${place27 && message.guild.member(place27).displayName || 'Nobody Yet'}: ${users[26] && users[26].level || '0'}
+28 - ${place28 && message.guild.member(place28).displayName || 'Nobody Yet'}: ${users[27] && users[27].level || '0'}
+29 - ${place29 && message.guild.member(place29).displayName || 'Nobody Yet'}: ${users[28] && users[28].level || '0'}
+30 - ${place30 && message.guild.member(place30).displayName || 'Nobody Yet'}: ${users[29] && users[29].level || '0'}`)
+            })
+        } else if (board === 'xmas2020') {
+            await xmas2020.Leaderboard({ /*limit: 10*/ }).then(async users => {
+                console.log(users);
+                if (users[0]) var firstplace = await client.fetchUser(users[0].userid);
+                if (users[1]) var secondplace = await client.fetchUser(users[1].userid);
+                if (users[2]) var thirdplace = await client.fetchUser(users[2].userid);
+                if (users[3]) var fourthplace = await client.fetchUser(users[3].userid);
+                if (users[4]) var fifthplace = await client.fetchUser(users[4].userid);
+                if (users[5]) var sixthplace = await client.fetchUser(users[5].userid);
+                if (users[6]) var seventhplace = await client.fetchUser(users[6].userid);
+                if (users[7]) var eighthplace = await client.fetchUser(users[7].userid);
+                if (users[8]) var ninthplace = await client.fetchUser(users[8].userid);
+                if (users[9]) var tenthplace = await client.fetchUser(users[9].userid);
+
+                var output = `**Christmas Event Leaderboard**
+1 - ${firstplace && message.guild.member(firstplace).displayName || 'Nobody Yet'}: ${users[0] && users[0].level || '0'}
+2 - ${secondplace && message.guild.member(secondplace).displayName || 'Nobody Yet'}: ${users[1] && users[1].level || '0'}
+3 - ${thirdplace && message.guild.member(thirdplace).displayName || 'Nobody Yet'}: ${users[2] && users[2].level || '0'}
+4 - ${fourthplace && message.guild.member(fourthplace).displayName || 'Nobody Yet'}: ${users[3] && users[3].level || '0'}
+5 - ${fifthplace && message.guild.member(fifthplace).displayName || 'Nobody Yet'}: ${users[4] && users[4].level || '0'}
+6 - ${sixthplace && message.guild.member(sixthplace).displayName || 'Nobody Yet'}: ${users[5] && users[5].level || '0'}
+7 - ${seventhplace && message.guild.member(seventhplace).displayName || 'Nobody Yet'}: ${users[6] && users[6].level || '0'}
+8 - ${eighthplace && message.guild.member(eighthplace).displayName || 'Nobody Yet'}: ${users[7] && users[7].level || '0'}
+9 - ${ninthplace && message.guild.member(ninthplace).displayName || 'Nobody Yet'}: ${users[8] && users[8].level || '0'}
+10 - ${tenthplace && message.guild.member(tenthplace).displayName || 'Nobody Yet'}: ${users[9] && users[9].level || '0'}`;
+
+                message.channel.send(output)
+            })
+        }  else if (board === 'mxdc2020') {
+            await mxdc2020.Leaderboard({ /*limit: 10*/ }).then(async users => {
+                console.log(users);
+                if (users[0]) var firstplace = await client.fetchUser(users[0].userid);
+                if (users[1]) var secondplace = await client.fetchUser(users[1].userid);
+                if (users[2]) var thirdplace = await client.fetchUser(users[2].userid);
+                if (users[3]) var fourthplace = await client.fetchUser(users[3].userid);
+                if (users[4]) var fifthplace = await client.fetchUser(users[4].userid);
+                if (users[5]) var sixthplace = await client.fetchUser(users[5].userid);
+                if (users[6]) var seventhplace = await client.fetchUser(users[6].userid);
+                if (users[7]) var eighthplace = await client.fetchUser(users[7].userid);
+                if (users[8]) var ninthplace = await client.fetchUser(users[8].userid);
+                if (users[9]) var tenthplace = await client.fetchUser(users[9].userid);
+
+                var output = `**Most Xtreme Darshlimination Challenge Leaderboard**
+1 - ${firstplace && message.guild.member(firstplace).displayName || 'Nobody Yet'}: ${users[0] && users[0].level || '0'}
+2 - ${secondplace && message.guild.member(secondplace).displayName || 'Nobody Yet'}: ${users[1] && users[1].level || '0'}
+3 - ${thirdplace && message.guild.member(thirdplace).displayName || 'Nobody Yet'}: ${users[2] && users[2].level || '0'}
+4 - ${fourthplace && message.guild.member(fourthplace).displayName || 'Nobody Yet'}: ${users[3] && users[3].level || '0'}
+5 - ${fifthplace && message.guild.member(fifthplace).displayName || 'Nobody Yet'}: ${users[4] && users[4].level || '0'}
+6 - ${sixthplace && message.guild.member(sixthplace).displayName || 'Nobody Yet'}: ${users[5] && users[5].level || '0'}
+7 - ${seventhplace && message.guild.member(seventhplace).displayName || 'Nobody Yet'}: ${users[6] && users[6].level || '0'}
+8 - ${eighthplace && message.guild.member(eighthplace).displayName || 'Nobody Yet'}: ${users[7] && users[7].level || '0'}
+9 - ${ninthplace && message.guild.member(ninthplace).displayName || 'Nobody Yet'}: ${users[8] && users[8].level || '0'}
+10 - ${tenthplace && message.guild.member(tenthplace).displayName || 'Nobody Yet'}: ${users[9] && users[9].level || '0'}`;
+
+                message.channel.send(output)
+            })
+        } else if (board === 'sdgc2020') {
+            await sdgc2020.Leaderboard({ /*limit: 10*/ }).then(async users => {
+                console.log(users);
+                if (users[0]) var firstplace = await client.fetchUser(users[0].userid);
+                if (users[1]) var secondplace = await client.fetchUser(users[1].userid);
+                if (users[2]) var thirdplace = await client.fetchUser(users[2].userid);
+                if (users[3]) var fourthplace = await client.fetchUser(users[3].userid);
+                if (users[4]) var fifthplace = await client.fetchUser(users[4].userid);
+                if (users[5]) var sixthplace = await client.fetchUser(users[5].userid);
+                if (users[6]) var seventhplace = await client.fetchUser(users[6].userid);
+                if (users[7]) var eighthplace = await client.fetchUser(users[7].userid);
+                if (users[8]) var ninthplace = await client.fetchUser(users[8].userid);
+                if (users[9]) var tenthplace = await client.fetchUser(users[9].userid);
+
+                var output = `**Super Ultra Mega Drax Gamer Challenge 3000 Leaderboard**
+1 - ${firstplace && message.guild.member(firstplace).displayName || 'Nobody Yet'}: ${users[0] && users[0].level || '0'}
+2 - ${secondplace && message.guild.member(secondplace).displayName || 'Nobody Yet'}: ${users[1] && users[1].level || '0'}
+3 - ${thirdplace && message.guild.member(thirdplace).displayName || 'Nobody Yet'}: ${users[2] && users[2].level || '0'}
+4 - ${fourthplace && message.guild.member(fourthplace).displayName || 'Nobody Yet'}: ${users[3] && users[3].level || '0'}
+5 - ${fifthplace && message.guild.member(fifthplace).displayName || 'Nobody Yet'}: ${users[4] && users[4].level || '0'}
+6 - ${sixthplace && message.guild.member(sixthplace).displayName || 'Nobody Yet'}: ${users[5] && users[5].level || '0'}
+7 - ${seventhplace && message.guild.member(seventhplace).displayName || 'Nobody Yet'}: ${users[6] && users[6].level || '0'}
+8 - ${eighthplace && message.guild.member(eighthplace).displayName || 'Nobody Yet'}: ${users[7] && users[7].level || '0'}
+9 - ${ninthplace && message.guild.member(ninthplace).displayName || 'Nobody Yet'}: ${users[8] && users[8].level || '0'}
+10 - ${tenthplace && message.guild.member(tenthplace).displayName || 'Nobody Yet'}: ${users[9] && users[9].level || '0'}`;
+
+                message.channel.send(output)
+            })
         } else if (board === 'christmas') {
             await snowlvl.Leaderboard({ }).then(async users => {
                 console.log(users);
@@ -8021,11 +8238,195 @@ client.on('message', async message => {
         message.channel.send(`🎃 Welcome to the 2019 TimCord Halloween Event! 🎃\n\nDuring the event, you will see dogs mysteriously appear who have come to bring you candy. Simply click the emoji beneath their picture to get a reward. The amount of candy you earn will be tracked over the course of the event, and there are prizes based on how much candy you collect. The top 7 placing members of the server at the end of the month will receive a gift of real candy of their choice shipped to them! (Thanks to Risc for helping sponsor the event!) Also, anyone who participates will receive a prize in SilverBux based on how much candy they collect. Good luck and have fun!`);
     }*/
 
-    if(command === `EVENT` || command === `HALLOWEEN` || command === `EVENTFAQ` || command === `EVENTINFO`) {
+    /*if(command === `EVENT` || command === `HALLOWEEN` || command === `EVENTFAQ` || command === `EVENTINFO`) {
         message.channel.send(`🎃 Welcome to the 2020 TimCord Halloween Event! 🎃\n\nDuring the event, you will see friendly halloween animals mysteriously appear who have come to bring you candy. Simply click the emoji beneath their picture to get a reward. The amount of candy you earn will be tracked over the course of the event, and there are prizes based on how much candy you collect. The top 10 placing members of the server at the end of the month, as well as 22nd place (sponsored by RestingCarcass), will receive a gift of real candy of their choice shipped to them! There will also be Steam game prizes given out to anyone who collects 500 or more candies, several trick games given out to random participants, and TimCoin prizes relative to your total amount of candies! Thank you to the event sponsors Drax, Farmstink, Midnight, RestingCarcass, Risc, and Silverhand.\n\nFor those familiar with the event there are several changes this year. First, monke has been added. Channels where candy can drop have been limited to #shithead-avenue #melee-salt #newhomies #fuck-whatever and #d1-lamb. There is now a per-user cooldown on triggering the bot to prevent spamming. There is also a very rare !jackpot of candy which grows in size the longer it goes without being collected.\n\nGood luck and have fun!`);
+    }*/
+
+    /*if (command === `EVENT`) {
+        message.channel.send(`🎁 Welcome to the 2020 TimCord Christmas Event! 🎁\n\nThis year's event is an advent calendar counting down the days to Christmas. Each day from the 1st through the 25th of December has a unique challenge, which will be posted in the #christmas-event channel. Complete the day's challenge and ping the @Verifier role with whatever proof may be necessary to get your point for that day. Use !christmas/!xmas to see your current points status and !leaderboard [christmas/xmas/event] for a full ranking.\n\nAt the end of the event, everyone will get 500tc per challenge completed. People with 15 or more challenges completed can claim a steam game from this list (<https://docs.google.com/spreadsheets/d/1BVQy1JJt_TzptASwHS5Ob7Jcp-OA2FZlrp1XjD3x1tQ/>), and anyone who completes all 25 challenges gets an additional 2500tc and silver will buy you a pizza!\n\nGood luck and have fun!`);
+    }*/
+
+    if (command === `EVENT`) {
+        message.channel.send(`Placeholder`);
     }
 
-    if (command === `CANDYFIX`) {
+    /*if (command === `CHRISTMAS` || command === `XMAS` || command === `POINTS`) {
+        var output = await xmas2020.Fetch(message.author.id);
+
+        const embed = new Discord.RichEmbed()
+            .setTitle(`${message.member.displayName}\'s Challenges Completed`)
+            .setColor(0xfdfdfd)
+            .addField(`Points`, `${output.level}`, true)
+        message.channel.send({embed});
+    }*/
+
+    /*if (command === `VERIFY`) {
+        //Check for better mod
+        if (!message.member.roles.find("name", verifierRole)) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: incorrect permissions')
+                .setDescription('This command requires the ' + verifierRole + ' role.')
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        var defineduser = '';
+        if (!args[0]) { //If they didn't define anyone, add it to their own balance
+            defineduser = sender;
+        } else { //If they define someone, run this
+            let firstMentioned = message.mentions.users.first();
+            defineduser = firstMentioned;
+        }
+
+        await xmas2020.AddLevel(defineduser.id, 1);
+
+        message.channel.send(`Verified.`);
+    }
+
+    if (command === `UNVERIFY`) {
+        //Check for better mod
+        if (!message.member.roles.find("name", verifierRole)) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: incorrect permissions')
+                .setDescription('This command requires the ' + verifierRole + ' role.')
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        var defineduser = '';
+        if (!args[0]) { //If they didn't define anyone, add it to their own balance
+            defineduser = sender;
+        } else { //If they define someone, run this
+            let firstMentioned = message.mentions.users.first();
+            defineduser = firstMentioned;
+        }
+
+        var fetchedLevel = await xmas2020.Fetch(defineduser.id);
+        await xmas2020.SetLevel(defineduser.id, (fetchedLevel.level - 1));
+
+        message.channel.send(`Unverified.`);
+    }*/
+
+    if (command === `MXDC` || command === `MXD` || command === `DARSHEVENT` || command === `DARSHPOINTS`) {
+        var output = await mxdc2020.Fetch(message.author.id);
+
+        const embed = new Discord.RichEmbed()
+            .setTitle(`${message.member.displayName}\'s MXDC Score`)
+            .setColor(0xfdfdfd)
+            .addField(`Points`, `${output.level}`, true)
+        message.channel.send({embed});
+    }
+
+    if (command === `SDGC` || command === `DRAXEVENT` || command === `POINTS` || command === `DRAXPOINTS`) {
+        var output = await sdgc2020.Fetch(message.author.id);
+
+        const embed = new Discord.RichEmbed()
+            .setTitle(`${message.member.displayName}\'s SDGC Score`)
+            .setColor(0x08f7ff)
+            .addField(`Points`, `${output.level}`, true)
+        message.channel.send({embed});
+    }
+
+    if (command === `VERIFY`) {
+        if (!message.member.roles.find("name", verifierRole)) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: incorrect permissions')
+                .setDescription('This command requires the ' + verifierRole + ' role.')
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        //Check if they defined an amount
+        if (!args[0]) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: no amount provided')
+                .setDescription(`This command requires an amount of points to add. \nExample: \`!verify <amount> <user>\``)
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        //Make sure args[0] is a number
+        if (isNaN(args[0])) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: not a number')
+                .setDescription(`This command requires an amount of points to add. Example: \`!verify <amount> <user>\``)
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        var defineduser = '';
+        if (!args[1]) { //If they didn't define anyone, add it to their own balance
+            defineduser = sender;
+        } else { //If they define someone, run this
+            let firstMentioned = message.mentions.users.first();
+            defineduser = firstMentioned;
+        }
+
+        await sdgc2020.SetXp(defineduser.id, 1);
+        var results = await sdgc2020.AddLevel(defineduser.id, args[0]);
+
+        const embed = new Discord.RichEmbed()
+            .setTitle(`${defineduser.username}\'s SDGC Score`)
+            .setColor(0x08f7ff)
+            .addField(`Points`, `${results.newlevel}`, true)
+        message.channel.send({embed});
+    }
+
+    if (command === `UNVERIFY`) {
+        //Check for better mod
+        if (!message.member.roles.find("name", verifierRole)) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: incorrect permissions')
+                .setDescription('This command requires the ' + verifierRole + ' role.')
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        //Check if they defined an amount
+        if (!args[0]) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: no amount provided')
+                .setDescription(`This command requires an amount of points to subtract. \nExample: \`!unverify <amount> <user>\``)
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        //Make sure args[0] is a number
+        if (isNaN(args[0])) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: not a number')
+                .setDescription(`This command requires an amount of points to subtract. Example: \`!unverify <amount> <user>\``)
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        var defineduser = '';
+        if (!args[1]) { //If they didn't define anyone, add it to their own balance
+            defineduser = sender;
+        } else { //If they define someone, run this
+            let firstMentioned = message.mentions.users.first();
+            defineduser = firstMentioned;
+        }
+
+        await sdgc2020.SetXp(defineduser.id, 1);
+        var results = await sdgc2020.AddLevel(defineduser.id, (args[0] * -1));
+
+        const embed = new Discord.RichEmbed()
+            .setTitle(`${defineduser.username}\'s SDGC Score`)
+            .setColor(0x08f7ff)
+            .addField(`Points`, `${results.newlevel}`, true)
+        message.channel.send({embed});
+    }
+
+    /*if (command === `CANDYFIX`) {
         await candy2020.SetXp(message.author.id, 1);
         message.channel.send('Fixed.');
     }
@@ -8033,15 +8434,15 @@ client.on('message', async message => {
     if (command === `FUCKCUCK`) {
         await candy2020.Delete(175333417481666571);
         message.channel.send('Fuck cuck.');
-    }
+    }*/
 
-    if (command === `JACKPOT` || command === `JACKY`) {
+    /*if (command === `JACKPOT` || command === `JACKY`) {
         var timbot = await candy2020.Fetch(608819901943119882);
         var currentJackpot = timbot.xp
         message.channel.send('🍬The jackpot is currently at ' + currentJackpot + ' candies!🍬');
-    }
+    }*/
 
-    if (command === `SETJACKPOT`) {
+    /*if (command === `SETJACKPOT`) {
         if (message.author.id == 72734539834720256) {
             var timbot = await candy2020.Fetch(608819901943119882);
             await candy2020.SetXp(608819901943119882, args[0]);
@@ -8050,9 +8451,9 @@ client.on('message', async message => {
         } else {
             return;
         }
-    }
+    }*/
 
-    if (command === `CANDY` || command === `CANDYBALANCE` || command === `CANDYBAL` || command === `CBAL` || command === `SWEETS` || command === `TREATS` || command === `CANDY` || command === `CANDYBALANCE` || command === `CANDYBAL` || command === `CBAL` || command === `SWEETS` || command === `TREATS`) {
+    /*if (command === `CANDY` || command === `CANDYBALANCE` || command === `CANDYBAL` || command === `CBAL` || command === `SWEETS` || command === `TREATS` || command === `CANDY` || command === `CANDYBALANCE` || command === `CANDYBAL` || command === `CBAL` || command === `SWEETS` || command === `TREATS`) {
         var output = await candy2020.Fetch(message.author.id);
 
         const embed = new Discord.RichEmbed()
@@ -8060,7 +8461,7 @@ client.on('message', async message => {
             .setColor(0xEB6123)
             .addField(`Candies`, `${output.level}`, true)
         message.channel.send({embed});
-    }
+    }*/
 
     //Christmas Event
     /*if (!message.author.bot && message.channel.name == 'snowball-fight') {
