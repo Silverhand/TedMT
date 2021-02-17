@@ -21,7 +21,7 @@
     "markov-generator": "^1.2.2",
     "markov-strings": "^2.1.0",
     "scrambo": "^0.3.0",
-    "sequelize": "^5.10.1",
+    "sequelize": "^5.15.1",
     "slot-machine": "^2.1.0",
     "sqlite3": "^4.0.9"
   }
