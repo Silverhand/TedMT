@@ -14,15 +14,16 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^5.1.0",
-    "discord-economy": "^1.1.6",
+    "discord-economy": "^1.2.2",
     "discord-leveling": "^1.1.0",
-    "discord.js": "^11.5.1",
-    "lodash": "^4.17.15",
-    "markov-generator": "^1.2.2",
-    "markov-strings": "^2.1.0",
+    "discord.js": "^11.6.4",
+    "lodash": "^4.17.21",
+    "markov-generator": "^1.2.3",
+    "markov-strings": "^2.1.1",
     "scrambo": "^0.3.0",
-    "sequelize": "^5.10.1",
+    "sequelize": "^5.22.4",
     "slot-machine": "^2.1.0",
-    "sqlite3": "^4.0.9"
+    "sqlite": "^4.0.21",
+    "sqlite3": "^4.2.0"
   }
 }

@@ -24,12 +24,13 @@ const banRole = 'useless bitch';
 const verifierRole = 'Verifier';
 const triggeredCandyRecently = new Set();
 var jackpotCounter = 100;
+var currentBracketLink = "No bracket currently set";
 const sql = require('sqlite');
 sql.open('Storage/userData.sqlite');
 
 //Initialization
 client.on('ready', () => {
-    console.log('TimBot v1.10.1 Launched');
+    console.log('TimBot v1.11.0 Launched');
 
     client.user.setActivity("with Sunny :)", { type: "PLAYING" });
 })
@@ -125,7 +126,7 @@ client.on('message', async message => {
         var command = args.shift().toUpperCase(); //Slices off the first word e.g. 'm!<this part>'
     }
 
-    if (args) {
+    if (args && command != `SETBRACKET` && command != `UPDATEBRACKET`) {
         for (var i = 0; i < args.length; i++) {
             args[i] = args[i].toUpperCase();
         }
@@ -411,18 +412,56 @@ client.on('message', async message => {
         message.channel.send('Fuck you!');
     }
 
-    if (command === `PANEL`) {
-        if (message.author.id == 72734539834720256) {
-            var role = message.guild.roles.find(role => role.name === "panelist");
-            message.member.addRole(role);
+    if (command === `SETBRACKET` || command === `UPDATEBRACKET`) {
+        //Check for better mod
+        if (!message.member.roles.find("name", modRole) && !message.member.roles.find("name", bankRole)) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: incorrect permissions')
+                .setDescription('This command requires the ' + modRole + ' role.')
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
         }
+
+        //Check if they defined an amount
+        if (!args[0]) {
+            const embed = new Discord.RichEmbed()
+                .setTitle('Error: no text provided')
+                .setDescription(`This command requires text to set as the bracket. \nExample: \`${prefixAlt}setbracket <link>\``)
+                .setColor(0xFF0000)
+            message.channel.send({embed});
+            return;
+        }
+
+        //currentBracketLink = args[0].toLowerCase();
+
+        /*if (args[0] && args[1] && args[2]) {
+            currentBracketLink = args[0].toLowerCase() + " " + args[1].toLowerCase() + " " + args[2].toLowerCase();
+        } else if (args[0] && args[1]) {
+            currentBracketLink = args[0].toLowerCase() + " " + args[1].toLowerCase();
+        } else {
+            currentBracketLink = args[0].toLowerCase();
+        }*/
+
+        if (args) {
+            currentBracketLink = '';
+            for (var i = 0; i < args.length; i++) {
+                currentBracketLink += args[i] + " ";
+            }
+        }
+
+        message.channel.send("Bracket link updated to "+currentBracketLink);
+    }
+
+    if (command === `BRACKET` || command === `SMASHGG`) {
+        message.channel.send(currentBracketLink);
     }
 
     if (command === `ROLL` || command === `DEATHROLL`) {
-        if (sender.id == 175333417481666571) {
+        /*if (sender.id == 175333417481666571) {
             message.channel.send(':skull: :one: :skull:');
             return;
-        }
+        }*/
 
         var max = 100;
         var min = 1;
@@ -1062,8 +1101,8 @@ client.on('message', async message => {
             `the thing that really throws me off about women is just how many there are`,
             `sigden your gay\nbackred by scuence`,
             `mother fucker just wasted half my buzz on semantics, I just got subjected like a mother Fer`,
-            `<:Popoga:648637180964634642> HHUUUUUUAAAAAAAAAHHHHHHHH`,
-            `<:Popoga:648637180964634642> DUUUOOOOOOHOHOHOOOOHOH`,
+            `<:Popoga:827512846048559134> HHUUUUUUAAAAAAAAAHHHHHHHH`,
+            `<:Popoga:827512846048559134> DUUUOOOOOOHOHOHOOOOHOH`,
             `life is a series of god playing <:geg:659862247702528055> with me`,
             `I'm gonna go chug some vodka and drive my car`,
             `the thing that really throws me off about women is just how many there are`,
@@ -1088,7 +1127,7 @@ client.on('message', async message => {
             `vanilla is not real melee`,
             `As a sound adult I respect your choice to not drink, but as a college aged male I have to call you a pussy bitch`,
             `sorry I'm kind of going cold turkey on reading`,
-            `:eggplant: :pregnant_woman: :sweat_drops: <:Popoga:648637180964634642>`,
+            `:eggplant: :pregnant_woman: :sweat_drops: <:Popoga:827512846048559134>`,
             `The beauty of my character is that you'll never know.`,
             `>super mario bros\n>you control a person\n>legend of zelda\n>you control a person\n>anyone realize we're just buying the same games over and over??`,
             `Gaming implies morality`,
@@ -1149,7 +1188,7 @@ client.on('message', async message => {
             `Playing melee is like riding a bike\nOnce you've put in the work, you're as good as you'll be`,
             `I wouldn't vote for loscar tbh`,
             `people who would be good politicians should be lined up and shot`,
-            `:slight_smile: <:popperga:659868423551189012> <:Popoga:648637180964634642>\n<:fiction:650026089183313940> <a:coomer:640217732209704970> <:hdab:612100964928847912>\n<:geg:659862247702528055> <:gegory:673650608095625280> <:gog:675831685404950530>`,
+            `:slight_smile: <:popperga:659868423551189012> <:Popoga:827512846048559134>\n<:fiction:650026089183313940> <a:coomer:640217732209704970> <:hdab:612100964928847912>\n<:geg:659862247702528055> <:gegory:673650608095625280> <:gog:675831685404950530>`,
             `antiprimpt`,
             `its a line, no questions`,
             `freely giving things is the only actual win win`,
@@ -1400,7 +1439,7 @@ client.on('message', async message => {
             `Why is there GREEN DAY in my Mario Maker???`,
             `just you wait until I quit my job to play dota`,
             `jesus three wheels of fortune\n\n1 more and you can craft the car of fortune`,
-            `ur guys' names are switched <:Popoga:648637180964634642> how deliciously naughty <:popogog:709232946799968316>`,
+            `ur guys' names are switched <:Popoga:827512846048559134> how deliciously naughty <:popogog:709232946799968316>`,
             `2% sugden\n5% pain\n20% "hello, it's me, Sugden"\n30% puff lame\n-40% luck\n??% skill\ndo not talk about the political status of israil\n10% pleasure\n0% cum\nand 100% reason to say, "I'm sugden"`,
             `Just upvote and move along please. We don't need comments like this taking up valuable space for discussion. I won't be downvoting this time, but next time I won't be so kind. Thank you for your cooperation`,
             `sheik is dairy farmer`,
@@ -1439,7 +1478,7 @@ client.on('message', async message => {
             `oh no he followed iut up woith a WORSE sentence`,
             `Campbell, K., & Herting-Wahl, K. (2012). If you can’t manage them, you can’t teach them. Nashville,TN: Incentive Publications.`,
             `76.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:5488076.27.6.108:54880`,
-            `haha the platform moved and its like fd now <:Popoga:648637180964634642>`,
+            `haha the platform moved and its like fd now <:Popoga:827512846048559134>`,
             `im kinda not listening to the college im in \nand the prof said something with risk so i almost responded \nAh yes professor did you say me, Risc, unofficially 15th in the Netherlands SSBM scene?`,
             `cant believe my job offer got turned into another argument about sheik`,
             `just like with real women, the best thing to do against peach is to avoid her`,
@@ -1462,7 +1501,7 @@ client.on('message', async message => {
             `of course. we are not defined by our mistakes, but our greatness in overcoming them \nnow i need to kill thiS FUCKING FLY THAT'S BEEN IN MY ASS ALL DAY`,
             `marth for me but not for thee`,
             `plato's gooncave`,
-            `talking to my mom \n<:Popoga:648637180964634642> 👍 \nshe ignored me <:Popoga:648637180964634642>`,
+            `talking to my mom \n<:Popoga:827512846048559134> 👍 \nshe ignored me <:Popoga:827512846048559134>`,
             `daisy looks good \nif she were real i would fuck her conceptually`,
             `itd be cool to see stavino do dr mario cosplay porn on twitch tbh`,
             `why is it q dropping \nthere is no q button`,
@@ -1495,7 +1534,7 @@ client.on('message', async message => {
             `just remembered that in middle school i went on a field trip to Newseum and saw a museum employee looking at porn in the Unabomber Cabin`,
             `im a fan of good old Jokes \nlike who cro chickcken road cross shit`,
             `two in the farmpink one in the farmstink`,
-            `Bitty boom bitty bang, almost 6 am \nGuess that's when i gotta hit that \n!crab uponafool <:Popoga:648637180964634642> <:grab:664168653121388555> 🦀`,
+            `Bitty boom bitty bang, almost 6 am \nGuess that's when i gotta hit that \n!crab uponafool <:Popoga:827512846048559134> <:grab:664168653121388555> 🦀`,
             `u guys ever think about how we turn bread and sunlight into muscles and poop`,
             `that timmy? cord. that fizzi? nice. that slippi? bless`,
             `Position is being re-evaluated per the pandemic \n<:notmad:648619766189391883> \nAh well \nI didn't even want to work with baby poop`,
@@ -1649,7 +1688,7 @@ client.on('message', async message => {
             `i main fox because i unironically think that darsh is actually correct with most of his takes about fox`,
             `hate falling thru my playstation 2`,
             `like when im playing against puff my face the whole time is <:shkrorhb:696519588678074388>`,
-            `<:sug_gm:612085633514471425> + <:SunnerZ:678445679110127646> <:TimmerZ:612076039144865824> + <:sugThink:612076103443677194> + <:Popoga:648637180964634642> + <:falcoS:612079928762040321> = <:sugW:612899384895733770>`,
+            `<:sug_gm:612085633514471425> + <:SunnerZ:678445679110127646> <:TimmerZ:612076039144865824> + <:sugThink:612076103443677194> + <:Popoga:827512846048559134> + <:falcoS:612079928762040321> = <:sugW:612899384895733770>`,
             `<:gog:675831685404950530> war\n<:gwup:750753918556045312> famine\n<:gegory:673650608095625280> pestilence\n<:geg:659862247702528055> death`,
             `<a:cagedane:740985925252939847>\n<:doit:612326812164423684>\n<:toem:612327049603842048>`,
             `Tell her yer a hydra so you can eat her in 8 places at once <:popogog:709232946799968316> idk something smooth and dirty`,
@@ -1807,7 +1846,7 @@ client.on('message', async message => {
             `:womans_hat:\n:poop:\n:shirt:\n:shorts:\n:ballet_shoes:\npoop man`,
             `websites are the forest of the 2000s.`,
             `How do u get ALL the stuf outta ur belly button`,
-            `Drmaryo <:Popoga:648637180964634642>`,
+            `Drmaryo <:Popoga:827512846048559134>`,
             `autism awarne`,
             `hbox eating tide pods`,
             `crt tube, it's like an atm machine`,
@@ -2280,7 +2319,7 @@ client.on('message', async message => {
         }
 
         var popoga = new SlotSymbol('popoga', {
-            display: `<:Popoga:648637180964634642>`,
+            display: `<:Popoga:827512846048559134>`,
             points: 20,
             weight: 100
         })
@@ -2351,7 +2390,7 @@ client.on('message', async message => {
 
         message.channel.send(spin.visualize());
 
-        await eco.SubstractFromBalance(sender.id, 100);
+        await eco.SubtractFromBalance(sender.id, 100);
 
         var results = await eco.AddToBalance(sender.id, spin.totalPoints);
         await ecolvl.SetXp(sender.id, 1);
@@ -2377,7 +2416,7 @@ client.on('message', async message => {
     }
 
     if (command === `SLOTSINFO`) {
-        message.channel.send(`The !slots/!slotmachine/!spin command can be used for 100 ${currencyName} and gives you a chance to win back more than you put in. Below are the point values for each emote, wildcard emotes can be used in any set:\n<:Popoga:648637180964634642> 20pts, common\n<:popperga:659868423551189012> 20pts, common\n:regional_indicator_e: 20pts, common\n<:TimmerZ:612076039144865824> 25pts, uncommon\n<:SunnerZ:678445679110127646> 25pts, uncommon\n<:choccymilk:809178733776732211> 50pts, rare\n<:geg:659862247702528055> 5pts, wildcard, common\n<:gegory:798611031176904724> 5pts, wildcard, common\n<:gwup:750753918556045312> 10pts, wildcard, uncommon\n<:gog:675831685404950530> 10pts, wildcard, uncommon\n<:popogog:798609891928702987> 1pt, wildcard, rare\n<a:goggers:797677760134381570> 100pts, wildcard, very rare\n\n\n||my legal team says I have to tell you that the average return for this is roughly 95 timcoin||`);
+        message.channel.send(`The !slots/!slotmachine/!spin command can be used for 100 ${currencyName} and gives you a chance to win back more than you put in. Below are the point values for each emote, wildcard emotes can be used in any set:\n<:Popoga:827512846048559134> 20pts, common\n<:popperga:659868423551189012> 20pts, common\n:regional_indicator_e: 20pts, common\n<:TimmerZ:612076039144865824> 25pts, uncommon\n<:SunnerZ:678445679110127646> 25pts, uncommon\n<:choccymilk:809178733776732211> 50pts, rare\n<:geg:659862247702528055> 5pts, wildcard, common\n<:gegory:798611031176904724> 5pts, wildcard, common\n<:gwup:750753918556045312> 10pts, wildcard, uncommon\n<:gog:675831685404950530> 10pts, wildcard, uncommon\n<:popogog:798609891928702987> 1pt, wildcard, rare\n<a:goggers:797677760134381570> 100pts, wildcard, very rare\n\n\n||my legal team says I have to tell you that the average return for this is roughly 95 timcoin||`);
     }
 
     //Calendar
@@ -2446,6 +2485,7 @@ client.on('message', async message => {
                 .setTitle(`March Calendar`)
                 .setColor(0x33bb46)
                 .addField('3/07', `Stream Mommy had a good take`, true)
+                .addField('3/13', `AntiPrompt's 18th Birthday`, true)
                 .addField('3/21', `Meinkraft Day`, true)
                 .addField('3/26', `The Great Wormpocalypse`, true)
                 .addField('3/27', `The Lost Tapes`, true)
@@ -3757,6 +3797,7 @@ client.on('message', async message => {
         var r = Math.floor((Math.random() * g.length));
 
         message.channel.send(g[r]);
+        //message.channel.send('Goiter has covid and is unavailable right now.');
     }
 
     //Axe
@@ -4365,7 +4406,7 @@ client.on('message', async message => {
             .setTitle(`CumCoin`)
             .setColor(0xFFFFFF)
             .addField(`Carcass's CumCoin`, `20000`, true)
-            .addField(`Loscar's Cumcoin`, `20001`, true)
+            .addField(`Silver's Cumcoin`, `20001`, true)
         message.channel.send({embed});
     }
 
@@ -4916,7 +4957,7 @@ client.on('message', async message => {
             `And the marfs in the cradle and the silver spoon... Hungrybox is the tru man-on-da-moon. When we gonna mm I don't know when... but I'll put a stop him thennn, I said I'm gonna stop him right thenn`,
             `Do you think "Onion Bless" is a slightly charming, yet overall pretty cool name?`,
             `Watching the matrix should be a solid reccomendation for new players coming from other smash games because of the part where morpheus explains to neo the matrix and what u can do in it`,
-            `<:Popoga:648637180964634642>`,
+            `<:Popoga:827512846048559134>`,
             `https://cdn.discordapp.com/attachments/612061367972790281/677339118434385920/IMG_20200212_202319.jpg`,
             `The flex of darsh, the finesse of soap, and the bless of coffee. By mastering these three keys of enlightenment, you can become the sickest melee player on tc`,
             `To da moom baybee :rocket:`];
@@ -5954,7 +5995,7 @@ client.on('message', async message => {
 "21:00 - uh oh, stinky!",
 "23:15 - stream mommy starts a semantics argument",
 "0:30 - Sugden is outed as a white nationalist",
-"9:30 - Icemaster writes <:Popoga:648637180964634642>  in every channel",
+"9:30 - Icemaster writes <:Popoga:827512846048559134>  in every channel",
 "7:15 - FloatyApologist announces his 5-step plan to kill all fastfallers",
 "10:00 - we all speedrun super mario world lu1g1%",
 "16:20 - Stream Mommy talks about weed. Again.",
@@ -6754,11 +6795,12 @@ client.on('message', async message => {
 
     //Vro
     if (command === `VRO` || command === `RATTAIL` || command === `SHITCOMMENTARY`) {
-        var r = Math.random() * 14;
+        var r = Math.random() * 15;
 
-        if (r <= 2) {
+        if (r <= 3) {
             var m = [`https://cdn.discordapp.com/attachments/611202965558132747/625272358583926784/unknown.png`,
-                    `https://cdn.discordapp.com/attachments/611202965558132747/625328138414718978/EBo4sqp.png`];
+                    `https://cdn.discordapp.com/attachments/611202965558132747/625328138414718978/EBo4sqp.png`,
+                    `https://media.discordapp.net/attachments/612058753293877274/718936699656208475/image0.jpg`];
 
             var r = Math.floor((Math.random() * m.length));
 
